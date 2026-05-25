@@ -19,6 +19,8 @@ jobs:
         run: python -m pytest
       - name: Voice lint
         run: python scripts/voice_lint.py
+      - name: check_no_bom
+        run: python scripts/check_no_bom.py
       - name: Spec check
         run: python scripts/spec_check.py
       - name: Validate decisions
