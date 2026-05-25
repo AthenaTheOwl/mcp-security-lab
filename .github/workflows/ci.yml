@@ -21,6 +21,19 @@ jobs:
         run: python scripts/voice_lint.py
       - name: Spec check
         run: python scripts/spec_check.py
+      - name: Validate decisions
+        run: python scripts/validate_decisions.py
+      - name: Validate roles
+        run: python scripts/validate_roles.py
+      - name: Validate tools
+        run: python scripts/validate_tools.py
+      - name: Validate policies
+        run: python scripts/validate_policies.py
+      - name: Validate skills
+        run: python scripts/validate_skills.py
+      - name: Validate dreams
+        run: python scripts/validate_dreams.py
+      - name: Schema cache freshness
+        run: python scripts/check_schema_cache_freshness.py
       - name: Example scan
         run: python -m mcp_security_lab scan examples/claude-desktop-config.json --out reports/ci-example.json
-

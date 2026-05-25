@@ -1,0 +1,18 @@
+# spec-check allowlist for deferred decision backfills.
+#
+# Every R-* requirement defined in specs/NNNN-*/requirements.md must
+# carry at least one decisions/DEC-*.md file. R-* IDs listed below
+# under `deferred:` are deferred backfills: the requirements shipped
+# before the matching DEC file landed; the DEC lands in a later pass.
+#
+# Format: a YAML list of R-* IDs under the `deferred` key. Each entry
+# carries a short note for context.
+
+deferred:
+  # No deferred entries. All five R-MCPSEC-* requirements carry a
+  # paired DEC under decisions/.
+
+roles_deferred:
+  # No roles deferred. R-MCPSEC-005 lists owner_role:planning_agent
+  # which maps to the control.coordinator role installed under
+  # .agents/roles/control.coordinator/.

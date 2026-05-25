@@ -13,7 +13,11 @@ authors = [{name = "AthenaTheOwl"}]
 dependencies = []
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = [
+  "pytest>=8",
+  "PyYAML>=6.0",
+  "jsonschema>=4.21",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]
