@@ -40,6 +40,16 @@ The command writes `report.json` and `report.md`. To choose the Markdown path:
 python -m mcp_security_lab scan examples/risky-filesystem-shell-server.json --out reports/risky.json --markdown reports/risky.md
 ```
 
+To compare an approved baseline report with a current report in CI:
+
+```powershell
+python -m mcp_security_lab diff --baseline reports/baseline.json --current reports/current.json --out reports/diff.json --fail-on-new-critical --fail-on-new-deny
+```
+
+The diff command writes `diff.json` and `diff.md`, prints a short
+summary, and exits nonzero only when a configured fail flag finds
+net-new high or critical risk or a newly denied policy decision.
+
 ## What it catches
 
 - `stdio` MCP servers that start local commands.
@@ -49,6 +59,9 @@ python -m mcp_security_lab scan examples/risky-filesystem-shell-server.json --ou
 - Injection phrases such as `ignore previous`, `exfiltrate`, `reveal secrets`, `disable safety`, `run shell`, `write file`, and `install package`.
 - Read-only resource servers, which get a lower score when they avoid command execution and unauthenticated remote access.
 - Optional YAML policy verdicts for each scanned server and declared tool.
+- Baseline-versus-current report drift that adds server findings,
+  changes tool policy decisions, introduces high or critical risk, or
+  adds a new `deny` verdict.
 
 ## What it does not catch
 
@@ -72,6 +85,7 @@ python scripts/validate_skills.py
 python scripts/validate_dreams.py
 python scripts/check_schema_cache_freshness.py
 python -m mcp_security_lab scan examples/claude-desktop-config.json --policy examples/policies/default.yaml --out reports/example.json
+python -m mcp_security_lab diff --baseline tests/fixtures/diff-baseline-report.json --current tests/fixtures/diff-current-clean-report.json --out reports/example-diff.json --fail-on-new-critical --fail-on-new-deny
 ```
 
 ## Governance

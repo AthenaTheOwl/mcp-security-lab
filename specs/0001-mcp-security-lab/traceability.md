@@ -11,3 +11,5 @@
 | R-MCPSEC-POL-002 | `mcp_security_lab/report.py`, `mcp_security_lab/policy.py`, `tests/test_policy.py` | DEC-MCPSEC-005-policy-evaluation-over-score-only-warnings |
 | R-MCPSEC-POL-003 | `tests/fixtures/*.json`, `tests/test_policy.py` | DEC-MCPSEC-005-policy-evaluation-over-score-only-warnings |
 | R-MCPSEC-POL-004 | `mcp_security_lab/cli.py`, `tests/test_policy.py` | DEC-MCPSEC-005-policy-evaluation-over-score-only-warnings |
+| R-MCPSEC-DIFF-001 | `mcp_security_lab/diff.py`, `tests/fixtures/diff-*.json`, `tests/test_diff.py` | DEC-MCPSEC-006-baseline-current-diff-gate |
+| R-MCPSEC-DIFF-002 | `mcp_security_lab/cli.py`, `mcp_security_lab/diff.py`, `tests/test_diff.py` | DEC-MCPSEC-006-baseline-current-diff-gate |

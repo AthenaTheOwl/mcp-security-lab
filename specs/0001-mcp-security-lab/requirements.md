@@ -17,3 +17,5 @@ MCP Security Lab scans static MCP server configuration before runtime and emits 
 | R-MCPSEC-POL-002 | Emit `allow`, `deny`, or `human_approval_required` per server and per tool. | owner_role:implementation_agent |
 | R-MCPSEC-POL-003 | Include fixtures for local shell, broad filesystem, remote unauthenticated, and read-only resource servers. | owner_role:review_agent |
 | R-MCPSEC-POL-004 | Exit nonzero when policy evaluation returns `deny` and the CLI is run with `--fail-on-deny`. | owner_role:implementation_agent |
+| R-MCPSEC-DIFF-001 | Compare baseline and current JSON reports and classify added, removed, and changed server findings plus tool policy decisions. | owner_role:implementation_agent |
+| R-MCPSEC-DIFF-002 | Exit nonzero from the diff CLI only when a configured gate detects net-new high or critical risk or a newly denied policy decision. | owner_role:implementation_agent |

@@ -1,0 +1,59 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-05-25T00:03:00+00:00",
+  "source": "current-new-deny.json",
+  "summary": {
+    "server_count": 1,
+    "max_score": 5,
+    "risk_counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0,
+      "critical": 0
+    }
+  },
+  "servers": [
+    {
+      "name": "docs-readonly",
+      "risk_score": 5,
+      "risk_level": "low",
+      "transport": "sse",
+      "read_only": true,
+      "findings": [],
+      "injection_matches": [],
+      "policy": {
+        "verdict": "allow",
+        "reasons": [
+          "Read-only resource server with auth metadata can pass the default policy."
+        ],
+        "matched_rules": [],
+        "tools": [
+          {
+            "name": "read_doc",
+            "verdict": "allow",
+            "reasons": [
+              "Tool does not match policy-controlled access patterns."
+            ],
+            "matched_rules": []
+          },
+          {
+            "name": "write_file",
+            "verdict": "deny",
+            "reasons": [
+              "Tool can write files or run shell commands."
+            ],
+            "matched_rules": [
+              {
+                "rule_id": "deny-shell-or-write-tool",
+                "verdict": "deny",
+                "reason": "Tool can write files or run shell commands.",
+                "matched_findings": [],
+                "matched_injection_rules": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

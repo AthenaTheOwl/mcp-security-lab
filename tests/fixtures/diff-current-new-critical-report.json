@@ -1,0 +1,67 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-05-25T00:02:00+00:00",
+  "source": "current-new-critical.json",
+  "summary": {
+    "server_count": 2,
+    "max_score": 85,
+    "risk_counts": {
+      "low": 1,
+      "medium": 0,
+      "high": 0,
+      "critical": 1
+    }
+  },
+  "servers": [
+    {
+      "name": "docs-readonly",
+      "risk_score": 5,
+      "risk_level": "low",
+      "transport": "sse",
+      "read_only": true,
+      "findings": [],
+      "injection_matches": [],
+      "policy": {
+        "verdict": "allow",
+        "reasons": [
+          "Read-only resource server with auth metadata can pass the default policy."
+        ],
+        "matched_rules": [],
+        "tools": [
+          {
+            "name": "read_doc",
+            "verdict": "allow",
+            "reasons": [
+              "Tool does not match policy-controlled access patterns."
+            ],
+            "matched_rules": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "local-filesystem-shell",
+      "risk_score": 85,
+      "risk_level": "critical",
+      "transport": "stdio",
+      "read_only": false,
+      "findings": [
+        {
+          "rule_id": "STDIO-COMMAND",
+          "severity": "high",
+          "message": "server starts a local command",
+          "evidence": "command",
+          "score_delta": 60
+        },
+        {
+          "rule_id": "INJECTION-CORPUS",
+          "severity": "high",
+          "message": "1 prompt or tool-injection phrase matched",
+          "evidence": "descriptors",
+          "score_delta": 25
+        }
+      ],
+      "injection_matches": []
+    }
+  ]
+}
