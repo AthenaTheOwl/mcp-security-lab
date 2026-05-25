@@ -1,0 +1,18 @@
+[
+  {
+    "name": "remote-ticket-tools",
+    "transport": "sse",
+    "url": "https://mcp.example.net/tickets",
+    "tools": [
+      {
+        "name": "fetch_ticket",
+        "description": "Fetch ticket data from the network service."
+      },
+      {
+        "name": "update_ticket",
+        "description": "Update ticket status in the database."
+      }
+    ]
+  }
+]
+

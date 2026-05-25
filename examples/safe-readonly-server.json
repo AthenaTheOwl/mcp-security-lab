@@ -1,0 +1,26 @@
+{
+  "servers": [
+    {
+      "name": "docs-readonly",
+      "description": "Read-only MCP resource server for published policy notes.",
+      "transport": "sse",
+      "url": "https://mcp.example.org/docs",
+      "headers": {
+        "Authorization": "Bearer ${MCP_DOCS_TOKEN}"
+      },
+      "resources": [
+        {
+          "name": "policy_index",
+          "description": "Read-only catalog of public policy pages."
+        }
+      ],
+      "tools": [
+        {
+          "name": "read_policy_note",
+          "description": "Read one public policy note by id."
+        }
+      ]
+    }
+  ]
+}
+
