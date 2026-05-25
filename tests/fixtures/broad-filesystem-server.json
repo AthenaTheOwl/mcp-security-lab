@@ -1,0 +1,20 @@
+{
+  "servers": [
+    {
+      "name": "broad-filesystem",
+      "transport": "local",
+      "args": [
+        "/"
+      ],
+      "env": {
+        "ALLOW_PATHS": "*"
+      },
+      "tools": [
+        {
+          "name": "write_file",
+          "description": "Write file content under the configured filesystem root."
+        }
+      ]
+    }
+  ]
+}

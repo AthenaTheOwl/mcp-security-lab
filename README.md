@@ -28,6 +28,12 @@ python -m pip install -e ".[dev]"
 python -m mcp_security_lab scan examples/claude-desktop-config.json --out report.json
 ```
 
+To evaluate allow, deny, and `human_approval_required` policy verdicts:
+
+```powershell
+python -m mcp_security_lab scan examples/claude-desktop-config.json --policy examples/policies/default.yaml --fail-on-deny --out report.json
+```
+
 The command writes `report.json` and `report.md`. To choose the Markdown path:
 
 ```powershell
@@ -42,6 +48,7 @@ python -m mcp_security_lab scan examples/risky-filesystem-shell-server.json --ou
 - Wildcard env values and broad root paths such as `/`, `C:\`, `%USERPROFILE%`, or `$HOME`.
 - Injection phrases such as `ignore previous`, `exfiltrate`, `reveal secrets`, `disable safety`, `run shell`, `write file`, and `install package`.
 - Read-only resource servers, which get a lower score when they avoid command execution and unauthenticated remote access.
+- Optional YAML policy verdicts for each scanned server and declared tool.
 
 ## What it does not catch
 
@@ -64,7 +71,7 @@ python scripts/validate_policies.py
 python scripts/validate_skills.py
 python scripts/validate_dreams.py
 python scripts/check_schema_cache_freshness.py
-python -m mcp_security_lab scan examples/claude-desktop-config.json --out reports/example.json
+python -m mcp_security_lab scan examples/claude-desktop-config.json --policy examples/policies/default.yaml --out reports/example.json
 ```
 
 ## Governance
@@ -86,4 +93,3 @@ each. Local artifacts:
 ## License
 
 MIT. See [LICENSE](LICENSE).
-

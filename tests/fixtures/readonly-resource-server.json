@@ -1,0 +1,24 @@
+{
+  "servers": [
+    {
+      "name": "readonly-resource",
+      "description": "Read-only resource server for public docs.",
+      "transport": "sse",
+      "url": "https://mcp.example.test/docs",
+      "headers": {
+        "Authorization": "Bearer ${MCP_DOCS_TOKEN}"
+      },
+      "resources": [
+        {
+          "name": "docs"
+        }
+      ],
+      "tools": [
+        {
+          "name": "read_doc",
+          "description": "Read one public doc."
+        }
+      ]
+    }
+  ]
+}

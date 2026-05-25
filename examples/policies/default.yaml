@@ -1,0 +1,95 @@
+schema_version: "0.1.0"
+server_default:
+  verdict: allow
+  reason: No deny or human approval server policy rule matched.
+tool_default:
+  verdict: allow
+  reason: Tool does not match policy-controlled access patterns.
+server_rules:
+  - id: deny-injection-language
+    verdict: deny
+    reason: Prompt or tool descriptor contains high-risk injection language.
+    match:
+      injection_rules_any:
+        - INJECT-IGNORE_PREVIOUS
+        - INJECT-EXFILTRATE
+        - INJECT-REVEAL_SECRETS
+        - INJECT-DISABLE_SAFETY
+        - INJECT-INSTALL_PACKAGE
+  - id: human-injection-language
+    verdict: human_approval_required
+    reason: Prompt or tool descriptor contains policy-controlled injection language.
+    match:
+      findings_any:
+        - INJECTION-CORPUS
+  - id: deny-broad-local-command
+    verdict: deny
+    reason: Local command server has broad filesystem or wildcard access.
+    match:
+      findings_all:
+        - STDIO-COMMAND
+        - BROAD-ACCESS
+  - id: human-broad-access
+    verdict: human_approval_required
+    reason: Broad filesystem or wildcard access requires human review.
+    match:
+      findings_any:
+        - BROAD-ACCESS
+  - id: human-stdio-command
+    verdict: human_approval_required
+    reason: Local command startup requires human review before allowlisting.
+    match:
+      findings_any:
+        - STDIO-COMMAND
+  - id: human-remote-no-auth
+    verdict: human_approval_required
+    reason: Remote transport lacks auth metadata.
+    match:
+      findings_any:
+        - REMOTE-NO-AUTH
+  - id: allow-readonly-resource
+    verdict: allow
+    reason: Read-only resource server with auth metadata can pass the default policy.
+    match:
+      read_only: true
+      findings_none:
+        - STDIO-COMMAND
+        - REMOTE-NO-AUTH
+        - INJECTION-CORPUS
+tool_rules:
+  - id: deny-shell-or-write-tool
+    verdict: deny
+    reason: Tool can write files or run shell commands.
+    match:
+      text_contains_any:
+        - write_file
+        - write file
+        - run_shell
+        - run shell
+        - shell
+        - exec
+        - powershell
+        - bash
+        - cmd
+  - id: human-sensitive-tool
+    verdict: human_approval_required
+    reason: Tool touches network, database, process, git, env, browser, email, or secrets surfaces.
+    match:
+      text_contains_any:
+        - network
+        - database
+        - sql
+        - process
+        - git
+        - env
+        - browser
+        - email
+        - secret
+        - token
+        - credential
+  - id: human-remote-no-auth-tool
+    verdict: human_approval_required
+    reason: Tool belongs to a remote server that lacks auth metadata.
+    match:
+      findings_any:
+        - REMOTE-NO-AUTH

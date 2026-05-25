@@ -1,0 +1,13 @@
+[
+  {
+    "name": "remote-unauthenticated",
+    "transport": "sse",
+    "url": "https://mcp.example.test/tickets",
+    "tools": [
+      {
+        "name": "fetch_ticket",
+        "description": "Fetch ticket data from the network service."
+      }
+    ]
+  }
+]

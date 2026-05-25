@@ -2,7 +2,7 @@
 
 ## Scope
 
-MCP Security Lab scans static MCP server configuration before runtime and emits JSON plus Markdown risk reports.
+MCP Security Lab scans static MCP server configuration before runtime and emits JSON plus Markdown risk and policy reports.
 
 ## Requirements
 
@@ -13,4 +13,7 @@ MCP Security Lab scans static MCP server configuration before runtime and emits 
 | R-MCPSEC-003 | Scan tool names, descriptions, and prompts with a fixed injection phrase corpus. | owner_role:review_agent |
 | R-MCPSEC-004 | Emit machine-readable JSON and reviewer-readable Markdown from the same scan. | owner_role:implementation_agent |
 | R-MCPSEC-005 | Keep portfolio gates in CI for tests, voice lint, and spec trace coverage. | owner_role:planning_agent |
-
+| R-MCPSEC-POL-001 | Evaluate a policy YAML file against each MCP server finding. | owner_role:implementation_agent |
+| R-MCPSEC-POL-002 | Emit `allow`, `deny`, or `human_approval_required` per server and per tool. | owner_role:implementation_agent |
+| R-MCPSEC-POL-003 | Include fixtures for local shell, broad filesystem, remote unauthenticated, and read-only resource servers. | owner_role:review_agent |
+| R-MCPSEC-POL-004 | Exit nonzero when policy evaluation returns `deny` and the CLI is run with `--fail-on-deny`. | owner_role:implementation_agent |

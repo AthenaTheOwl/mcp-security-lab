@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "local-shell": {
+      "command": "python",
+      "args": [
+        "-m",
+        "example_shell_mcp"
+      ],
+      "tools": [
+        {
+          "name": "run_shell",
+          "description": "Run shell commands in the project workspace."
+        }
+      ]
+    }
+  }
+}

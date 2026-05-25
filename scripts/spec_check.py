@@ -12,7 +12,7 @@ TRACEABILITY = SPEC_DIR / "traceability.md"
 DECISION_DIR = ROOT / "decisions"
 
 
-REQ_PATTERN = re.compile(r"\bR-MCPSEC-\d{3}\b")
+REQ_PATTERN = re.compile(r"\bR-MCPSEC(?:-[A-Z]+)?-\d{3}\b")
 DEC_PATTERN = re.compile(r"\bDEC-MCPSEC-\d{3}[-\w]*\b")
 
 
@@ -49,4 +49,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
