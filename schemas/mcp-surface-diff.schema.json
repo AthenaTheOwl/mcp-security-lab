@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://athena.dev/mcp-security-lab/schemas/mcp-surface-diff.schema.json",
+  "title": "MCP Surface Diff Report",
+  "description": "Structured drift report produced by validate_athena_mcp_surface.py. Compares the committed athena-mcp-server tool-surface snapshot against the live server's declared surface and enumerates added, removed, and changed tools by input-schema hash.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "snapshot_path",
+    "live_source",
+    "drift_detected",
+    "summary",
+    "added_tools",
+    "removed_tools",
+    "changed_tools"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version of this diff report shape."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp when the diff was computed."
+    },
+    "snapshot_path": {
+      "type": "string",
+      "description": "Filesystem path to the committed snapshot the gate read."
+    },
+    "live_source": {
+      "type": "string",
+      "description": "How the live surface was obtained, e.g. 'apps/mcp-server/scripts/snapshot-tool-surface.ts' or a static-parse marker."
+    },
+    "drift_detected": {
+      "type": "boolean",
+      "description": "True if any added, removed, or changed tool was found."
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added", "removed", "changed", "unchanged"],
+      "properties": {
+        "added": {"type": "integer", "minimum": 0},
+        "removed": {"type": "integer", "minimum": 0},
+        "changed": {"type": "integer", "minimum": 0},
+        "unchanged": {"type": "integer", "minimum": 0}
+      }
+    },
+    "added_tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "input_schema_hash"],
+        "properties": {
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "input_schema_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "removed_tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "input_schema_hash"],
+        "properties": {
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "input_schema_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        }
+      }
+    },
+    "changed_tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "snapshot", "live"],
+        "properties": {
+          "name": {"type": "string"},
+          "snapshot": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["input_schema_hash"],
+            "properties": {
+              "description": {"type": "string"},
+              "input_schema_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+            }
+          },
+          "live": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["input_schema_hash"],
+            "properties": {
+              "description": {"type": "string"},
+              "input_schema_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
