@@ -163,7 +163,12 @@ def obtain_live_surface(
         raise RuntimeError("npm not on PATH; cannot regenerate live snapshot.")
 
     snapshot_file = mcp_server_dir / "tool-surface.snapshot.json"
-    backup_text = snapshot_file.read_text(encoding="utf-8") if snapshot_file.is_file() else None
+    # Use binary I/O for the backup+restore pair so the round-trip is
+    # byte-perfect. Text-mode read_text/write_text performs CRLF<->LF
+    # translation on Windows, which would leave the LF-committed snapshot
+    # file dirty after every gate run. The intermediate JSON load below
+    # stays text-mode because JSON is whitespace-insensitive.
+    backup_bytes = snapshot_file.read_bytes() if snapshot_file.is_file() else None
     try:
         result = subprocess.run(
             [npm, "run", "--silent", "snapshot"],
@@ -186,8 +191,8 @@ def obtain_live_surface(
         # Always restore the committed snapshot byte-for-byte so this gate is
         # non-destructive. The snapshot script is deterministic so this
         # round-trip is normally identical, but we restore unconditionally.
-        if backup_text is not None:
-            snapshot_file.write_text(backup_text, encoding="utf-8")
+        if backup_bytes is not None:
+            snapshot_file.write_bytes(backup_bytes)
 
     return live, f"npm:snapshot@{mcp_server_dir}"
 

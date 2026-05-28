@@ -225,6 +225,80 @@ def test_report_conforms_to_diff_schema(tmp_path: Path) -> None:
     jsonschema.validate(instance=report, schema=schema)
 
 
+def test_obtain_live_surface_preserves_snapshot_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The npm-regeneration path must restore the committed snapshot
+    byte-for-byte, including line endings. Regression test for the Windows
+    CRLF<->LF text-mode corruption that left the LF-committed snapshot
+    dirty after every gate run.
+    """
+    import argparse
+    import subprocess
+
+    # Build a fake athena-site layout under tmp_path.
+    mcp_dir = tmp_path / "apps" / "mcp-server"
+    mcp_dir.mkdir(parents=True)
+    snapshot_file = mcp_dir / "tool-surface.snapshot.json"
+
+    # LF-only payload, the exact line-ending shape the real committed
+    # snapshot uses. If text-mode I/O is anywhere on the backup/restore
+    # path, this body will come back as CRLF on Windows.
+    original_bytes = (
+        b'{\n  "version": "0.1.0",\n  "tools": [\n'
+        b'    {"name": "t1", "description": "d", "input_schema_hash": "'
+        + (b"a" * 64)
+        + b'"}\n  ]\n}\n'
+    )
+    snapshot_file.write_bytes(original_bytes)
+    pre_bytes = snapshot_file.read_bytes()
+    assert b"\r\n" not in pre_bytes  # sanity
+
+    # The "live" surface the fake npm script would produce. Mismatched
+    # content guarantees the restore is what put the original back, not
+    # a no-op.
+    live_payload = {
+        "version": "0.1.0",
+        "tools": [
+            {"name": "t1", "description": "d", "input_schema_hash": "b" * 64},
+            {"name": "t2", "description": "d", "input_schema_hash": "c" * 64},
+        ],
+    }
+
+    def fake_which(name: str) -> str:
+        assert name == "npm"
+        return "/fake/npm"
+
+    def fake_run(cmd, cwd, capture_output, text, check):  # noqa: ANN001
+        # Simulate npm run snapshot by overwriting the file with the
+        # live payload (this is the surface the snapshot script would
+        # produce in reality).
+        snapshot_file.write_text(
+            json.dumps(live_payload, indent=2) + "\n", encoding="utf-8"
+        )
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(validator_module.shutil, "which", fake_which)
+    monkeypatch.setattr(validator_module.subprocess, "run", fake_run)
+
+    args = argparse.Namespace(
+        snapshot=snapshot_file,
+        live=None,
+        athena_site_repo=tmp_path,
+        out=tmp_path / "report.json",
+    )
+    live, label = validator_module.obtain_live_surface(args, snapshot_file)
+
+    # Live surface came from the simulated npm run.
+    assert {t["name"] for t in live["tools"]} == {"t1", "t2"}
+    assert label.startswith("npm:snapshot@")
+
+    # Snapshot file restored byte-for-byte. No CRLF leakage.
+    post_bytes = snapshot_file.read_bytes()
+    assert post_bytes == original_bytes
+    assert b"\r\n" not in post_bytes
+
+
 def test_against_real_athena_site_snapshot(tmp_path: Path) -> None:
     real_snapshot = (
         ROOT / ".." / "athena-site" / "apps" / "mcp-server" / "tool-surface.snapshot.json"
