@@ -13,3 +13,5 @@
 | R-MCPSEC-POL-004 | `mcp_security_lab/cli.py`, `tests/test_policy.py` | DEC-MCPSEC-005-policy-evaluation-over-score-only-warnings |
 | R-MCPSEC-DIFF-001 | `mcp_security_lab/diff.py`, `tests/fixtures/diff-*.json`, `tests/test_diff.py` | DEC-MCPSEC-006-baseline-current-diff-gate |
 | R-MCPSEC-DIFF-002 | `mcp_security_lab/cli.py`, `mcp_security_lab/diff.py`, `tests/test_diff.py` | DEC-MCPSEC-006-baseline-current-diff-gate |
+| R-MCPSEC-MCPSURF-001 | `scripts/validate_athena_mcp_surface.py`, `tests/test_validate_athena_mcp_surface.py`, `.github/workflows/ci.yml` | DEC-MCPSEC-007-athena-mcp-surface-drift-gate |
+| R-MCPSEC-MCPSURF-002 | `schemas/mcp-surface-diff.schema.json`, `scripts/validate_athena_mcp_surface.py` (build_diff_report), `tests/test_validate_athena_mcp_surface.py` (test_report_conforms_to_diff_schema) | DEC-MCPSEC-007-athena-mcp-surface-drift-gate |

@@ -19,3 +19,5 @@ MCP Security Lab scans static MCP server configuration before runtime and emits 
 | R-MCPSEC-POL-004 | Exit nonzero when policy evaluation returns `deny` and the CLI is run with `--fail-on-deny`. | owner_role:implementation_agent |
 | R-MCPSEC-DIFF-001 | Compare baseline and current JSON reports and classify added, removed, and changed server findings plus tool policy decisions. | owner_role:implementation_agent |
 | R-MCPSEC-DIFF-002 | Exit nonzero from the diff CLI only when a configured gate detects net-new high or critical risk or a newly denied policy decision. | owner_role:implementation_agent |
+| R-MCPSEC-MCPSURF-001 | Gate the athena-site MCP server tool surface against its committed snapshot; exit nonzero when added, removed, or changed tools are detected by name or input-schema hash. | owner_role:implementation_agent |
+| R-MCPSEC-MCPSURF-002 | Emit a structured diff report conforming to `schemas/mcp-surface-diff.schema.json` whenever the gate runs, including drift_detected, summary counts, and per-tool entries for added/removed/changed. | owner_role:review_agent |
