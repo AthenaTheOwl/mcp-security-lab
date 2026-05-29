@@ -81,6 +81,37 @@ rollback: |
   work because nothing about that path has been deleted — the alias
   preserves the old CLI shape end-to-end.
 owner: platform
+systems_map: |
+  Registry-as-extension-unit for portfolio-wide gates. The lab owns
+  one gate, one report shape, one test fixture pattern; a YAML
+  registry lists which servers the gate iterates. Per-server scripts
+  would scale the gate's complexity with the portfolio; the registry
+  keeps complexity flat regardless of how many MCP servers join.
+transferable_principle: |
+  When a single-target gate proves itself, parameterize over a
+  registry before the second target lands — the registry shape is
+  cheaper to design once than to retrofit after copy-paste duplication
+  has set in.
+falsification_test: |
+  If adding the second registered MCP server (e.g. Codex's runtime
+  surface) requires more than a one-line registry append plus
+  per-server env-var declaration, the registry-as-unit-of-extension
+  claim is falsified and the gate needs another redesign pass.
+adoption_ladder:
+  minimum_viable: |
+    Registry parses; --server-id targets one server; legacy alias
+    script keeps DEC-MCPSEC-007 CLI working.
+  mid_adoption: |
+    CI runs --all by default; second MCP server joins via registry
+    append; per-server diff reports land at deterministic paths.
+  full_adoption: |
+    Every portfolio MCP server is registered; disabled-flag handles
+    deprecation; the alias script can be removed once no CI invocation
+    uses it.
+  monitoring_signals:
+    - registry entry count over time
+    - per-server drift_detected rate per gate run
+    - count of CI invocations still using the legacy alias script
 ---
 
 ## decision

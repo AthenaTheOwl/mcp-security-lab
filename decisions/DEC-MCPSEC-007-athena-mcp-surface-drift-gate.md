@@ -73,6 +73,42 @@ rollback: |
   athena-site MCP server continues to operate; only the drift gate is
   removed.
 owner: platform
+systems_map: |
+  Contract-via-committed-snapshot for cross-repo APIs. The MCP
+  server's tool surface is a stable contract; the snapshot file is
+  the contract artifact; regenerating the snapshot via the server's
+  own script gives the gate the same view a real MCP client gets.
+  Drift means the snapshot was not regenerated when it should have
+  been, which is exactly the moment a reviewer needs to look.
+transferable_principle: |
+  A contract without drift detection is a wish; ship the gate the
+  same week the contract artifact lands, using the contract producer's
+  own regeneration script as the live source so producer and gate
+  cannot diverge in interpretation.
+falsification_test: |
+  If a downstream agent breaks against the athena-site MCP server
+  surface while the gate reports drift_detected: false on the same
+  commit range, the snapshot-as-contract claim is falsified and the
+  gate is missing a surface dimension (e.g. output schema, error
+  envelope, tool ordering) the contract should cover.
+adoption_ladder:
+  minimum_viable: |
+    Gate compares committed snapshot to live regeneration for the
+    athena-site MCP server; exits 1 on any tool name, description, or
+    input-schema hash divergence; emits a structured diff report.
+  mid_adoption: |
+    Diff report shape locked behind a schema; tests cover match,
+    drift, missing-snapshot, malformed-snapshot, and real-snapshot
+    cases; CI runs the gate on every push.
+  full_adoption: |
+    Gate generalizes via DEC-MCPSEC-008's registry so additional MCP
+    servers enroll without code changes; per-server diff reports feed
+    a single portfolio dashboard.
+  monitoring_signals:
+    - drift_detected rate per gate run on main
+    - count of malformed-snapshot failures (signals snapshot tooling
+      drift)
+    - time-to-merge for PRs that touch the snapshot
 ---
 
 ## decision

@@ -48,6 +48,39 @@ rollback: |
   diff gate reads their JSON output and does not alter report
   generation.
 owner: platform
+systems_map: |
+  Reports-as-stable-interface for CI gates. The scanner emits a
+  typed JSON report; the diff gate consumes two reports and produces
+  a structured comparison without re-running the scanner. Putting
+  the gate at the report boundary lets scoring and policy logic
+  evolve independently of the diff logic.
+transferable_principle: |
+  When a pipeline emits a typed artifact, build downstream gates on
+  the artifact, not on the pipeline's internals — the gate stays
+  stable across producer refactors and the artifact stays the
+  reviewable evidence.
+falsification_test: |
+  If a config change that introduces a net-new high-risk finding
+  fails to flip the gate to exit 1 with --fail-on-high (or vice
+  versa: a benign report edit triggers a false fail), the
+  baseline-vs-current comparison is missing a signal the report
+  shape claims to encode.
+adoption_ladder:
+  minimum_viable: |
+    Diff CLI consumes two scan reports, classifies added/removed/
+    changed findings, and exits 0 unconditionally.
+  mid_adoption: |
+    --fail-on-high and --fail-on-deny flags wire CI to specific
+    risk-class deltas; fixtures cover added/removed/changed per
+    server and per tool.
+  full_adoption: |
+    Diff reports feed the portfolio dashboard alongside the surface
+    drift gate (DEC-MCPSEC-007/008); a single review packet shows
+    config drift, surface drift, and policy verdict drift together.
+  monitoring_signals:
+    - rate of --fail-on-* gate failures per week
+    - count of net-new high/critical risks introduced per merged PR
+    - false-positive reports filed against the diff CLI
 ---
 
 ## decision
