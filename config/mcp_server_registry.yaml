@@ -1,0 +1,34 @@
+# MCP Server Registry
+#
+# Every MCP server enrolled in the mcp-security-lab drift gate is listed here.
+# The surface-drift gate (scripts/validate_mcp_surface.py) iterates this file
+# and gates each enabled entry against its committed tool-surface snapshot.
+#
+# Adding a new MCP server to the drift gate is a one-step operation: append an
+# entry below with id/name/repo/server_path/snapshot_path/snapshot_script/runtime.
+# CI picks it up on the next run via the `--all` flag; no workflow edit needed.
+#
+# Per-server resolution rules (matches scripts/validate_mcp_surface.py):
+#   - repo: directory name of the sibling repo holding the server source.
+#     Resolved in order:
+#       1. env var <ID_UPPER>_REPO (e.g. ATHENA_SITE_REPO)
+#       2. sibling directory next to mcp-security-lab (i.e. ../<repo>)
+#   - server_path: path inside <repo> where the MCP server source lives.
+#   - snapshot_path: path (relative to <repo>) of the committed
+#     tool-surface.snapshot.json this gate compares against.
+#   - snapshot_script: shell command to run inside <repo>/<server_path> to
+#     regenerate the live surface. Output must land at
+#     <repo>/<snapshot_path>. The gate backs up the committed snapshot
+#     byte-for-byte and restores it after reading the regenerated file.
+#   - runtime: informational; "node" today. Used by future per-runtime hooks.
+#   - enabled: false skips the entry entirely (no fetch, no gate, no report).
+version: 1
+servers:
+  - id: athena-portfolio-query
+    name: Athena Portfolio Query MCP Server
+    repo: athena-site
+    server_path: apps/mcp-server
+    snapshot_path: apps/mcp-server/tool-surface.snapshot.json
+    snapshot_script: npm run snapshot
+    runtime: node
+    enabled: true
