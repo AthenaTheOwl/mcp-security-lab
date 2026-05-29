@@ -62,11 +62,16 @@ jobs:
       - name: Install athena-mcp-server deps
         working-directory: athena-site/apps/mcp-server
         run: npm install --no-audit --no-fund
-      - name: Validate athena MCP server tool surface
+      # Drift gate: iterate every enabled MCP server in
+      # config/mcp_server_registry.yaml and compare each one's committed
+      # tool-surface snapshot against the regenerated live surface.
+      # Adding a new MCP server to this gate is a registry-append; the
+      # workflow does not need to change.
+      - name: Validate registered MCP server tool surfaces
         working-directory: mcp-security-lab
         env:
           ATHENA_SITE_REPO: ${{ github.workspace }}/athena-site
-        run: python scripts/validate_athena_mcp_surface.py
+        run: python scripts/validate_mcp_surface.py --all
       - name: Example scan
         working-directory: mcp-security-lab
         run: python -m mcp_security_lab scan examples/claude-desktop-config.json --out reports/ci-example.json
