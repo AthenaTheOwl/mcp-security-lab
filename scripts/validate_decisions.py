@@ -114,6 +114,39 @@ def discover_decisions() -> list[Path]:
     )
 
 
+SYSTEMS_THINKING_FIELDS = (
+    "systems_map",
+    "transferable_principle",
+    "falsification_test",
+    "adoption_ladder",
+)
+
+
+def check_systems_thinking_fields(data: dict[str, Any]) -> list[str]:
+    """Return the names of systems-thinking fields missing from an approved DEC.
+
+    Per DEC-CDCP-020 in athena-site, every approved DEC should carry
+    `systems_map`, `transferable_principle`, `falsification_test`, and
+    `adoption_ladder`. The fields are optional in the schema; the
+    validator emits a warning (not a failure) so the discipline ramps in
+    without blocking the bootstrap pass. After 30 days, an amendment DEC
+    ratchets these to failures.
+    """
+    if data.get("status") != "approved":
+        return []
+    missing: list[str] = []
+    for field in SYSTEMS_THINKING_FIELDS:
+        value = data.get(field)
+        if value is None:
+            missing.append(field)
+            continue
+        if isinstance(value, str) and not value.strip():
+            missing.append(field)
+        if field == "adoption_ladder" and isinstance(value, dict) and not value:
+            missing.append(field)
+    return missing
+
+
 def main() -> int:
     try:
         import jsonschema  # type: ignore[import-not-found]
@@ -134,6 +167,7 @@ def main() -> int:
         return 0
 
     violations: list[str] = []
+    warnings: list[str] = []
     for dec_path in decisions:
         rel = dec_path.relative_to(ROOT).as_posix()
         data, err = parse_front_matter(dec_path)
@@ -154,6 +188,21 @@ def main() -> int:
         for err_obj in errors:
             location = "/".join(str(part) for part in err_obj.absolute_path) or "<root>"
             violations.append(f"{rel}: {location}: {err_obj.message}")
+        missing = check_systems_thinking_fields(data)
+        if missing:
+            warnings.append(
+                f"{rel}: missing systems-thinking field(s): {', '.join(missing)} "
+                f"(per DEC-CDCP-020; warning today, failure after 30 days)"
+            )
+
+    if warnings:
+        print(
+            "validate_decisions: systems-thinking discipline warnings "
+            "(per DEC-CDCP-020)",
+            file=sys.stderr,
+        )
+        for w in warnings:
+            print(f"  - {w}", file=sys.stderr)
 
     if violations:
         print("validate_decisions: violations found", file=sys.stderr)
