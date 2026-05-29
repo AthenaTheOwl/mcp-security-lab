@@ -1,4 +1,9 @@
-"""Tests for scripts/validate_athena_mcp_surface.py.
+"""Tests for the single-server (athena-portfolio-query) drift gate path.
+
+DEC-MCPSEC-008 renamed the gate to scripts/validate_mcp_surface.py and
+parameterized it over the MCP server registry. The athena-site-specific
+script is now a thin back-compat alias. These tests exercise the
+single-server CLI contract end-to-end against the new gate module.
 
 Strategy: each test writes a small snapshot + a small live JSON to a tmp
 directory and invokes main() with --snapshot and --live so the gate has no
@@ -18,18 +23,18 @@ import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT_PATH = ROOT / "scripts" / "validate_athena_mcp_surface.py"
+SCRIPT_PATH = ROOT / "scripts" / "validate_mcp_surface.py"
 SCHEMA_PATH = ROOT / "schemas" / "mcp-surface-diff.schema.json"
 
 
 def _load_module():
     spec = importlib.util.spec_from_file_location(
-        "validate_athena_mcp_surface", SCRIPT_PATH
+        "validate_mcp_surface", SCRIPT_PATH
     )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
-    sys.modules.setdefault("validate_athena_mcp_surface", module)
+    sys.modules.setdefault("validate_mcp_surface", module)
     spec.loader.exec_module(module)
     return module
 
@@ -228,12 +233,11 @@ def test_report_conforms_to_diff_schema(tmp_path: Path) -> None:
 def test_obtain_live_surface_preserves_snapshot_bytes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """The npm-regeneration path must restore the committed snapshot
-    byte-for-byte, including line endings. Regression test for the Windows
-    CRLF<->LF text-mode corruption that left the LF-committed snapshot
-    dirty after every gate run.
+    """The snapshot-script-regeneration path must restore the committed
+    snapshot byte-for-byte, including line endings. Regression test for the
+    Windows CRLF<->LF text-mode corruption that left the LF-committed
+    snapshot dirty after every gate run.
     """
-    import argparse
     import subprocess
 
     # Build a fake athena-site layout under tmp_path.
@@ -254,7 +258,7 @@ def test_obtain_live_surface_preserves_snapshot_bytes(
     pre_bytes = snapshot_file.read_bytes()
     assert b"\r\n" not in pre_bytes  # sanity
 
-    # The "live" surface the fake npm script would produce. Mismatched
+    # The "live" surface the fake snapshot script would produce. Mismatched
     # content guarantees the restore is what put the original back, not
     # a no-op.
     live_payload = {
@@ -270,9 +274,8 @@ def test_obtain_live_surface_preserves_snapshot_bytes(
         return "/fake/npm"
 
     def fake_run(cmd, cwd, capture_output, text, check):  # noqa: ANN001
-        # Simulate npm run snapshot by overwriting the file with the
-        # live payload (this is the surface the snapshot script would
-        # produce in reality).
+        # Simulate the snapshot script by overwriting the file with the
+        # live payload (this is what the snapshot script writes in reality).
         snapshot_file.write_text(
             json.dumps(live_payload, indent=2) + "\n", encoding="utf-8"
         )
@@ -281,17 +284,23 @@ def test_obtain_live_surface_preserves_snapshot_bytes(
     monkeypatch.setattr(validator_module.shutil, "which", fake_which)
     monkeypatch.setattr(validator_module.subprocess, "run", fake_run)
 
-    args = argparse.Namespace(
-        snapshot=snapshot_file,
-        live=None,
-        athena_site_repo=tmp_path,
-        out=tmp_path / "report.json",
+    server = {
+        "id": "athena-portfolio-query",
+        "name": "Athena Portfolio Query MCP Server",
+        "repo": "athena-site",
+        "server_path": "apps/mcp-server",
+        "snapshot_path": "apps/mcp-server/tool-surface.snapshot.json",
+        "snapshot_script": "npm run snapshot",
+        "runtime": "node",
+        "enabled": True,
+    }
+    live, label = validator_module.obtain_live_surface_for_server(
+        server, snapshot_file, tmp_path
     )
-    live, label = validator_module.obtain_live_surface(args, snapshot_file)
 
-    # Live surface came from the simulated npm run.
+    # Live surface came from the simulated snapshot script.
     assert {t["name"] for t in live["tools"]} == {"t1", "t2"}
-    assert label.startswith("npm:snapshot@")
+    assert label.startswith("script:npm run snapshot@")
 
     # Snapshot file restored byte-for-byte. No CRLF leakage.
     post_bytes = snapshot_file.read_bytes()
