@@ -35,6 +35,9 @@ jobs:
       - name: check_no_bom
         working-directory: mcp-security-lab
         run: python scripts/check_no_bom.py
+      - name: Sensitive disclosure gate
+        working-directory: mcp-security-lab
+        run: python scripts/validate_sensitive_disclosures.py
       - name: Spec check
         working-directory: mcp-security-lab
         run: python scripts/spec_check.py
