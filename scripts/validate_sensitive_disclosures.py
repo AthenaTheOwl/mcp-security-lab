@@ -44,7 +44,7 @@ ALLOWLIST = {
 
 PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("google-api-key", re.compile(r"AIza[0-9A-Za-z_-]{35}")),
-    ("openai-api-key", re.compile(r"sk-(?:proj-)?[A-Za-z0-9_-]{32,}")),
+    ("openai-api-key", re.compile(r"sk-proj-[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9]{48,}")),
     ("anthropic-api-key", re.compile(r"sk-ant-[A-Za-z0-9_-]{20,}")),
     (
         "github-token",
@@ -60,7 +60,8 @@ PATTERNS: list[tuple[str, re.Pattern[str]]] = [
         "literal-api-key-assignment",
         re.compile(
             r"(GNEWS_API_KEY|GOOGLE_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|RESEND_API_KEY|STRIPE_SECRET_KEY)"
-            r"\s*=\s*[^<\s#][^\r\n]+",
+            r"\s*=\s*(?!($|<|your-|placeholder|change-me|changeme|example|dummy|redacted))"
+            r"[^#\s][^\r\n]+",
             re.IGNORECASE,
         ),
     ),
@@ -75,7 +76,10 @@ PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     (
         "secret-fingerprint-disclosure",
         re.compile(
-            r"(fingerprint|key tail|key ending|key starts? with|key starting|secret tail|secret ending).{0,96}"
+            r"((\bkey\b|\bsecret\b|\btoken\b|\bcredential\b).{0,32}"
+            r"(\bfingerprint\b|\btail\b|\bending\b|starts? with|starting)|"
+            r"(\bfingerprint\b|\btail\b|\bending\b).{0,32}"
+            r"(\bkey\b|\bsecret\b|\btoken\b|\bcredential\b)).{0,96}"
             r"([a-f0-9]{8,64}|[A-Za-z0-9_-]{4,})",
             re.IGNORECASE,
         ),
@@ -83,8 +87,9 @@ PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     (
         "security-incident-source-artifact",
         re.compile(
-            r"(secret[- ]?audit|security[- ]?audit|remediation runbook|REAL_LEAK|"
-            r"leaked API key|linkedin.{0,40}(api key|secret|token))",
+            r"((secret[- ]?audit|security[- ]?audit).{0,80}"
+            r"(finding|findings|verdict|credential|key|token|leak|runbook|scanner)|"
+            r"remediation runbook|REAL_LEAK|leaked API key|linkedin.{0,40}(api key|secret|token))",
             re.IGNORECASE,
         ),
     ),
