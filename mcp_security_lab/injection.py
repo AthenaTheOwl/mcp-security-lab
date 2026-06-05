@@ -5,13 +5,62 @@ from typing import Any
 
 
 INJECTION_PATTERNS = {
+    # Override / suppression
     "ignore_previous": re.compile(r"\bignore\s+(all\s+)?previous\b", re.IGNORECASE),
-    "exfiltrate": re.compile(r"\bexfiltrat(?:e|ion|ing)\b", re.IGNORECASE),
-    "reveal_secrets": re.compile(r"\breveal\s+(?:the\s+)?secrets?\b", re.IGNORECASE),
+    "ignore_instructions": re.compile(
+        r"\bignore\s+(?:the\s+)?(?:above|prior|previous|earlier)\s+instructions?\b",
+        re.IGNORECASE,
+    ),
     "disable_safety": re.compile(r"\bdisable\s+(?:all\s+)?safet(?:y|ies)\b", re.IGNORECASE),
-    "run_shell": re.compile(r"\brun\s+(?:a\s+)?shell\b|\bshell\s+command\b", re.IGNORECASE),
+    "forget_system_prompt": re.compile(
+        r"\bforget\s+(?:the\s+|your\s+)?(?:system\s+)?prompt\b", re.IGNORECASE
+    ),
+    # Exfiltration
+    "exfiltrate": re.compile(r"\bexfiltrat(?:e|ion|ing)\b", re.IGNORECASE),
+    "send_to_external": re.compile(
+        r"\bsend\s+[^.\n]{1,40}?\s+to\s+(?:an?\s+)?external\b", re.IGNORECASE
+    ),
+    "upload_to_url": re.compile(
+        r"\bupload\s+(?:to|via)\s+(?:a\s+)?(?:url|webhook|endpoint)\b", re.IGNORECASE
+    ),
+    "reveal_secrets": re.compile(r"\breveal\s+(?:the\s+)?secrets?\b", re.IGNORECASE),
+    # Role override / impersonation
+    "you_are_now": re.compile(r"\byou\s+are\s+now\s+(?:a|an|the)\b", re.IGNORECASE),
+    "act_as_system": re.compile(
+        r"\bact\s+as\s+(?:a\s+|the\s+)?(?:system|root|admin|developer)\b", re.IGNORECASE
+    ),
+    "system_note_prefix": re.compile(
+        r"^\s*(?:\[?system\s*(?:note|message)\]?|<\s*system\s*>)",
+        re.IGNORECASE | re.MULTILINE,
+    ),
+    "assistant_impersonation": re.compile(
+        r"\b(?:assistant|model):\s*(?:i\s+will|sure|certainly)\b", re.IGNORECASE
+    ),
+    # Output redirection / persistence
     "write_file": re.compile(r"\bwrite\s+(?:a\s+)?file\b", re.IGNORECASE),
+    "save_as": re.compile(
+        r"\bsave\s+(?:as|to)\s+(?:a\s+|the\s+)?(?:file|disk)\b", re.IGNORECASE
+    ),
+    # Execution / install
+    "run_shell": re.compile(r"\brun\s+(?:a\s+)?shell\b|\bshell\s+command\b", re.IGNORECASE),
     "install_package": re.compile(r"\binstall\s+(?:an?\s+)?package\b", re.IGNORECASE),
+    "curl_pipe_sh": re.compile(
+        r"\bcurl\s+[^\n]+\|\s*(?:bash|sh|zsh)\b", re.IGNORECASE
+    ),
+    # Indirect / obfuscation
+    "base64_encoded_instruction": re.compile(
+        r"\b(?:base64|b64)(?:-?(?:encode|decode))?\b.{0,80}\b(?:instruction|prompt|payload)\b",
+        re.IGNORECASE | re.DOTALL,
+    ),
+    "unicode_confusable_ignore": re.compile(
+        # Common confusable-character substitutions of injection verbs.
+        # The Latin lowercase 'i' is often replaced with Cyrillic 'і'
+        # (U+0456) or Latin small letter dotless i (U+0131) to slip past
+        # ASCII-only filters: "іgnore", "ɪgnore". The Cyrillic 'е' (U+0435)
+        # likewise replaces Latin 'e' in "rеveal".
+        r"[ɪіⅰιⅼ]gnore\b|r[еeē]veal",
+        re.IGNORECASE | re.UNICODE,
+    ),
 }
 
 
