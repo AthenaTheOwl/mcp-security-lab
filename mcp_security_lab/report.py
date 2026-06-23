@@ -104,6 +104,78 @@ def render_markdown(report: dict[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def render_show(report: dict[str, Any]) -> str:
+    """Render a committed report as a ranked, human-readable summary."""
+    servers = sorted(
+        report["servers"],
+        key=lambda s: s["risk_score"],
+        reverse=True,
+    )
+    summary = report["summary"]
+    counts = summary["risk_counts"]
+
+    lines = [
+        "MCP Security Lab - config risk review",
+        f"source: {report['source']}",
+        (
+            f"servers: {summary['server_count']}   "
+            f"max score: {summary['max_score']}   "
+            f"risk: low={counts['low']} medium={counts['medium']} "
+            f"high={counts['high']} critical={counts['critical']}"
+        ),
+        "",
+        "servers ranked by risk score:",
+        "",
+        f"  {'#':>2}  {'score':>5}  {'level':<8}  {'transport':<9}  {'verdict':<22}  server",
+        f"  {'-' * 2}  {'-' * 5}  {'-' * 8}  {'-' * 9}  {'-' * 22}  {'-' * 24}",
+    ]
+    for rank, server in enumerate(servers, start=1):
+        policy = server.get("policy")
+        verdict = policy["verdict"] if isinstance(policy, dict) else "-"
+        lines.append(
+            f"  {rank:>2}  {server['risk_score']:>5}  {server['risk_level']:<8}  "
+            f"{server['transport']:<9}  {verdict:<22}  {server['name']}"
+        )
+
+    top = servers[0]
+    top_findings = [
+        f"{f['rule_id']} ({f['severity']})"
+        for f in top["findings"]
+        if f["severity"] in ("high", "critical") or f["score_delta"] > 0
+    ]
+    inj = top.get("injection_matches", [])
+    lines.extend(
+        [
+            "",
+            f"highest-risk server: {top['name']} (score {top['risk_score']}, {top['risk_level']})",
+        ]
+    )
+    if top_findings:
+        lines.append("  flagged: " + ", ".join(top_findings))
+    if inj:
+        phrases = sorted({m["match"].lower() for m in inj})
+        lines.append(f"  injection phrases ({len(inj)}): " + ", ".join(phrases))
+
+    if "policy" in report:
+        vc = report["policy"]["verdict_counts"]
+        denied = [
+            s["name"]
+            for s in servers
+            if isinstance(s.get("policy"), dict) and s["policy"]["verdict"] == "deny"
+        ]
+        lines.append("")
+        lines.append(
+            "policy verdicts: "
+            f"allow={vc['allow']}, "
+            f"human_approval_required={vc['human_approval_required']}, "
+            f"deny={vc['deny']}"
+        )
+        if denied:
+            lines.append("  denied (do not allowlist): " + ", ".join(denied))
+
+    return "\n".join(lines) + "\n"
+
+
 def _risk_count_text(counts: dict[str, int]) -> str:
     return ", ".join(f"{level}={counts[level]}" for level in ("low", "medium", "high", "critical"))
 

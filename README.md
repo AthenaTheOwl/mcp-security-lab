@@ -50,6 +50,30 @@ The diff command writes `diff.json` and `diff.md`, prints a short
 summary, and exits nonzero only when a configured fail flag finds
 net-new high or critical risk or a newly denied policy decision.
 
+## try it
+
+Read the committed example report and print a ranked review, no arguments and no network:
+
+```text
+$ python -m mcp_security_lab show
+MCP Security Lab - config risk review
+source: examples\claude-desktop-config.json
+servers: 3   max score: 100   risk: low=1 medium=0 high=1 critical=1
+
+servers ranked by risk score:
+
+   #  score  level     transport  verdict                 server
+   1    100  critical  stdio      deny                    local-filesystem-shell
+   2     51  high      sse        human_approval_required  remote-ticket-tools
+   3      5  low       sse        allow                   docs-readonly
+
+highest-risk server: local-filesystem-shell (score 100, critical)
+  injection phrases (6): ignore previous, reveal secrets, run shell, write file
+  denied (do not allowlist): local-filesystem-shell
+```
+
+This shows, at a glance, which MCP server in a config you should not allowlist and why.
+
 ## What it catches
 
 - `stdio` MCP servers that start local commands.

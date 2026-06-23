@@ -13,7 +13,9 @@ from .diff import (
     write_diff_reports,
 )
 from .policy import load_policy, policy_has_deny
-from .report import build_report, write_reports
+from .report import build_report, render_show, write_reports
+
+DEFAULT_SHOW_REPORT = Path(__file__).resolve().parent.parent / "reports" / "example.json"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,6 +36,18 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=None,
         help="Markdown report path; defaults to the JSON path with .md suffix",
+    )
+
+    show = subcommands.add_parser(
+        "show",
+        help="print a ranked, human-readable summary of a committed report",
+    )
+    show.add_argument(
+        "report",
+        type=Path,
+        nargs="?",
+        default=DEFAULT_SHOW_REPORT,
+        help="JSON report path (defaults to the committed example report)",
     )
 
     diff = subcommands.add_parser("diff", help="compare two MCP Security Lab JSON reports")
@@ -75,6 +89,13 @@ def main(argv: list[str] | None = None) -> int:
         if args.fail_on_deny and policy is not None and policy_has_deny(report):
             print("Policy denied at least one server or tool.")
             return 1
+        return 0
+
+    if args.command == "show":
+        import json
+
+        report = json.loads(Path(args.report).read_text(encoding="utf-8"))
+        print(render_show(report), end="")
         return 0
 
     if args.command == "diff":
