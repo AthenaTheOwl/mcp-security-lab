@@ -74,6 +74,25 @@ highest-risk server: local-filesystem-shell (score 100, critical)
 
 This shows, at a glance, which MCP server in a config you should not allowlist and why.
 
+## live demo
+
+an interactive page that mirrors `python -m mcp_security_lab show`: the config
+risk review table, summary metrics, and the highest-risk server with its
+injection phrases and policy verdict. it reads the committed
+`reports/example.json` directly — no network, no secrets.
+
+run locally:
+
+```powershell
+python -m pip install -r requirements.txt
+streamlit run streamlit_app.py
+```
+
+deploy on streamlit community cloud: new app -> repo `AthenaTheOwl/mcp-security-lab`,
+branch `main`, main file `streamlit_app.py`.
+
+<!-- live url: https://share.streamlit.io/... -->
+
 ## What it catches
 
 - `stdio` MCP servers that start local commands.
