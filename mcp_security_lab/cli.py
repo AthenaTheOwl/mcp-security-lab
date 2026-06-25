@@ -18,6 +18,7 @@ from .report import build_report, render_show, write_reports
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_SHOW_REPORT = REPO_ROOT / "reports" / "example.json"
 DEFAULT_SHOW_CONFIG = REPO_ROOT / "examples" / "claude-desktop-config.json"
+DEFAULT_SHOW_POLICY = REPO_ROOT / "examples" / "policies" / "default.yaml"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -100,7 +101,13 @@ def main(argv: list[str] | None = None) -> int:
         if report_path.exists():
             report = json.loads(report_path.read_text(encoding="utf-8"))
         elif report_path == DEFAULT_SHOW_REPORT and DEFAULT_SHOW_CONFIG.exists():
-            report = build_report(load_servers(DEFAULT_SHOW_CONFIG), DEFAULT_SHOW_CONFIG)
+            policy = load_policy(DEFAULT_SHOW_POLICY) if DEFAULT_SHOW_POLICY.exists() else None
+            report = build_report(
+                load_servers(DEFAULT_SHOW_CONFIG),
+                DEFAULT_SHOW_CONFIG,
+                policy=policy,
+                policy_source=DEFAULT_SHOW_POLICY if policy is not None else None,
+            )
         else:
             raise FileNotFoundError(report_path)
         print(render_show(report), end="")
