@@ -15,7 +15,9 @@ from .diff import (
 from .policy import load_policy, policy_has_deny
 from .report import build_report, render_show, write_reports
 
-DEFAULT_SHOW_REPORT = Path(__file__).resolve().parent.parent / "reports" / "example.json"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_SHOW_REPORT = REPO_ROOT / "reports" / "example.json"
+DEFAULT_SHOW_CONFIG = REPO_ROOT / "examples" / "claude-desktop-config.json"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -94,7 +96,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "show":
         import json
 
-        report = json.loads(Path(args.report).read_text(encoding="utf-8"))
+        report_path = Path(args.report)
+        if report_path.exists():
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        elif report_path == DEFAULT_SHOW_REPORT and DEFAULT_SHOW_CONFIG.exists():
+            report = build_report(load_servers(DEFAULT_SHOW_CONFIG), DEFAULT_SHOW_CONFIG)
+        else:
+            raise FileNotFoundError(report_path)
         print(render_show(report), end="")
         return 0
 
