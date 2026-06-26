@@ -1,58 +1,36 @@
-# MCP Security Lab
+# mcp-security-lab
 
-MCP Security Lab is a 30-second preflight check for Model Context Protocol server configs. Point it at a Claude Desktop style config, a `servers` list, or a flat list of server entries and it flags command execution, broad filesystem access, unauthenticated remote transports, sensitive tool keywords, and prompt or tool-injection language before those servers run.
+A Claude Desktop config lists three MCP servers. One of them starts a local
+shell, can write files, and carries six injection phrases in its tool text. It
+scores 100 out of 100 and the policy says deny. The other two are a remote ticket
+tool that needs a human to approve it and a read-only docs server that's fine. You
+learn this before any of the three connect.
 
-This repo follows three current security signals:
+## What it does
 
-- The MCP security guidance treats local server startup commands, broad scopes, HTTP auth gaps, SSRF paths, and sandboxing as first-order review items: [MCP security best practices](https://modelcontextprotocol.io/specification/2025-06-18/basic/security_best_practices).
-- Claude Code security docs place MCP servers behind source-controlled configuration, permission settings, trust checks, and user review: [Claude Code security](https://docs.anthropic.com/en/docs/claude-code/security).
-- OpenAI's Agents SDK direction assumes prompt injection and exfiltration attempts, and separates agent harness from sandbox compute: [Agents SDK evolution](https://openai.com/index/the-next-evolution-of-the-agents-sdk).
+An MCP server is a process your agent trusts. Before it joins the allowlist,
+someone has to read the config and decide whether trusting it is a mistake. That
+read is the kind of work that gets skipped when there are three servers and a
+deadline, and skipping it is how a server that starts a shell ends up inside the
+loop.
 
-## For your role
+mcp-security-lab does the read deterministically. Point it at a Claude Desktop
+config, a `servers` list, or a flat list of entries. It scores each server 0 to
+100, flags the surfaces that earn the score — local command execution, broad
+filesystem roots, remote transports with no auth metadata, sensitive tool
+keywords, prompt- and tool-injection language — and, if you hand it a policy,
+stamps each server allow, deny, or human-approval-required. No runtime, no
+network. It reads what the config already says and tells you what you'd have
+agreed to.
 
-- Security reviewer: get a deterministic triage report before an MCP server enters an allowlist.
-- Agent platform engineer: turn config review into a repeatable CI gate.
-- Founder or hiring manager: see a small, public-read artifact that connects agent trust claims to code, specs, decisions, and tests.
+It does not watch the server after it starts, vet the package behind the command,
+or judge whether the auth it found is real. It catches the things that are
+visible at review time, which is the moment you still have the choice.
 
-## Install
+## Try it
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
-```
-
-## Run
-
-```powershell
-python -m mcp_security_lab scan examples/claude-desktop-config.json --out report.json
-```
-
-To evaluate allow, deny, and `human_approval_required` policy verdicts:
-
-```powershell
-python -m mcp_security_lab scan examples/claude-desktop-config.json --policy examples/policies/default.yaml --fail-on-deny --out report.json
-```
-
-The command writes `report.json` and `report.md`. To choose the Markdown path:
-
-```powershell
-python -m mcp_security_lab scan examples/risky-filesystem-shell-server.json --out reports/risky.json --markdown reports/risky.md
-```
-
-To compare an approved baseline report with a current report in CI:
-
-```powershell
-python -m mcp_security_lab diff --baseline reports/baseline.json --current reports/current.json --out reports/diff.json --fail-on-new-critical --fail-on-new-deny
-```
-
-The diff command writes `diff.json` and `diff.md`, prints a short
-summary, and exits nonzero only when a configured fail flag finds
-net-new high or critical risk or a newly denied policy decision.
-
-## try it
-
-Read the committed example report and print a ranked review, no arguments and no network:
+One command, no arguments, no network. It reads the committed example report and
+prints a ranked review:
 
 ```text
 $ python -m mcp_security_lab show
@@ -63,18 +41,23 @@ servers: 3   max score: 100   risk: low=1 medium=0 high=1 critical=1
 servers ranked by risk score:
 
    #  score  level     transport  verdict                 server
+  --  -----  --------  ---------  ----------------------  ------------------------
    1    100  critical  stdio      deny                    local-filesystem-shell
    2     51  high      sse        human_approval_required  remote-ticket-tools
    3      5  low       sse        allow                   docs-readonly
 
 highest-risk server: local-filesystem-shell (score 100, critical)
+  flagged: STDIO-COMMAND (high), FILESYSTEM-SURFACE (medium), SENSITIVE-KEYWORDS (medium), BROAD-ACCESS (medium), INJECTION-CORPUS (high)
   injection phrases (6): ignore previous, reveal secrets, run shell, write file
+
+policy verdicts: allow=1, human_approval_required=1, deny=1
   denied (do not allowlist): local-filesystem-shell
 ```
 
-This shows, at a glance, which MCP server in a config you should not allowlist and why.
+Ranked worst first. The server at the top is the one you do not allowlist, and the
+line under it says why.
 
-## live demo
+## Live demo
 
 an interactive page that mirrors `python -m mcp_security_lab show`: the config
 risk review table, summary metrics, and the highest-risk server with its
@@ -95,24 +78,69 @@ branch `main`, main file `streamlit_app.py`.
 
 ## What it catches
 
-- `stdio` MCP servers that start local commands.
-- Tool names, descriptions, prompts, args, env, and scopes that mention filesystem, shell, process, git, network, browser, email, database, secret, or env access.
-- Remote URL transports that lack auth metadata in config.
-- Wildcard env values and broad root paths such as `/`, `C:\`, `%USERPROFILE%`, or `$HOME`.
-- Injection phrases such as `ignore previous`, `exfiltrate`, `reveal secrets`, `disable safety`, `run shell`, `write file`, and `install package`.
-- Read-only resource servers, which get a lower score when they avoid command execution and unauthenticated remote access.
-- Optional YAML policy verdicts for each scanned server and declared tool.
-- Baseline-versus-current report drift that adds server findings,
-  changes tool policy decisions, introduces high or critical risk, or
-  adds a new `deny` verdict.
+- `stdio` servers that start a local command.
+- Tool names, descriptions, prompts, args, env, and scopes that mention
+  filesystem, shell, process, git, network, browser, email, database, secret, or
+  env access.
+- Remote URL transports with no auth metadata in the config.
+- Wildcard env values and broad roots like `/`, `C:\`, `%USERPROFILE%`, `$HOME`.
+- Injection phrases: `ignore previous`, `exfiltrate`, `reveal secrets`,
+  `disable safety`, `run shell`, `write file`, `install package`.
+- Read-only resource servers, which score lower when they avoid command
+  execution and unauthenticated remote access.
+- Optional YAML policy verdicts per server and declared tool.
+- Drift between an approved baseline report and the current one — new findings,
+  changed tool decisions, freshly introduced high/critical risk, a new `deny`.
 
-## What it does not catch
+It stops where review stops. Runtime behavior, supply-chain risk inside the
+package, whether the auth is valid, hidden text returned after connection, and
+network-destination safety past the static URL are all outside what a config can
+tell you, and the tool says so rather than pretending otherwise.
 
-- Runtime behavior after the server starts.
-- Supply-chain risk inside an npm, Python, or binary package.
-- Whether auth metadata is valid, scoped, or rotated.
-- Hidden prompt text returned after connection.
-- Network destination safety beyond static URL and metadata checks.
+## Run it
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+```
+
+Scan a config, with and without a policy:
+
+```powershell
+python -m mcp_security_lab scan examples/claude-desktop-config.json --out report.json
+python -m mcp_security_lab scan examples/claude-desktop-config.json --policy examples/policies/default.yaml --fail-on-deny --out report.json
+```
+
+The command writes `report.json` and `report.md`. Choose the Markdown path
+yourself with `--markdown`:
+
+```powershell
+python -m mcp_security_lab scan examples/risky-filesystem-shell-server.json --out reports/risky.json --markdown reports/risky.md
+```
+
+Compare an approved baseline with the current report in CI. It exits nonzero only
+when a fail flag finds net-new high or critical risk or a newly denied decision:
+
+```powershell
+python -m mcp_security_lab diff --baseline reports/baseline.json --current reports/current.json --out reports/diff.json --fail-on-new-critical --fail-on-new-deny
+```
+
+## How it connects
+
+This is the trust check at the front of the agent. The control plane it runs
+under, and where the cross-repo schemas live, is
+[athena-site](https://github.com/AthenaTheOwl/athena-site/blob/main/ops/control-plane.md)
+— the charter names six artifact types (specs, decisions, dreams, ledgers,
+schemas, policies) and gates each. Local copies of those artifacts sit here:
+
+- `specs/0001-mcp-security-lab/` names the R-MCPSEC-* requirements.
+- `decisions/DEC-MCPSEC-*.md` records each architectural choice.
+- `.agents/` holds the six roles, the tool registry, the policy set, the state
+  machines, and the workflows.
+- `dreams/` reserves the shape for the weekly offline-cognition pass.
+- `ops/RELEASE_LEDGER.md`, `ops/RESET_LEDGER.md`, and `ops/event-log/` carry the
+  audit trail.
 
 ## Development gates
 
@@ -130,22 +158,6 @@ python scripts/check_schema_cache_freshness.py
 python -m mcp_security_lab scan examples/claude-desktop-config.json --policy examples/policies/default.yaml --out reports/example.json
 python -m mcp_security_lab diff --baseline tests/fixtures/diff-baseline-report.json --current tests/fixtures/diff-current-clean-report.json --out reports/example-diff.json --fail-on-new-critical --fail-on-new-deny
 ```
-
-## Governance
-
-This repo runs under the Cognitive Delivery Control Plane charter at
-[`athena-site/ops/control-plane.md`](https://github.com/AthenaTheOwl/athena-site/blob/main/ops/control-plane.md).
-The charter names six artifact types (specs, decisions, dreams,
-ledgers, schemas, policies) and the cross-repo schemas that gate
-each. Local artifacts:
-
-- `specs/0001-mcp-security-lab/` names the R-MCPSEC-* requirements.
-- `decisions/DEC-MCPSEC-*.md` records each architectural choice.
-- `.agents/` holds the six minimum-viable roles, the tool registry,
-  the policy set, the state-machines, and the workflows.
-- `dreams/` reserves the shape for the weekly offline-cognition pass.
-- `ops/RELEASE_LEDGER.md` and `ops/RESET_LEDGER.md` carry the audit
-  trail; `ops/event-log/` holds the structured event stream.
 
 ## License
 
