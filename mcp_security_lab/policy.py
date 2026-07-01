@@ -18,7 +18,11 @@ def load_policy(path: Path) -> dict[str, Any]:
             "PyYAML is required for --policy. Install with `pip install pyyaml`."
         ) from exc
 
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ValueError(f"{path}: cannot read ({exc.strerror})") from exc
+    data = yaml.safe_load(text)
     if not isinstance(data, dict):
         raise ValueError(f"{path} must contain a YAML mapping")
     _validate_policy(data, path)

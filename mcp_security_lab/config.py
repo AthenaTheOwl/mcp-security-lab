@@ -32,7 +32,13 @@ def normalize_servers(data: Any) -> list[ServerConfig]:
 
 def _load_json(path: Path) -> Any:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        # Missing file, a directory, or a permission error should read like the
+        # JSON error below, not surface as a raw traceback.
+        raise ValueError(f"{path}: cannot read ({exc.strerror})") from exc
+    try:
+        return json.loads(text)
     except json.JSONDecodeError as exc:
         raise ValueError(f"{path} is not valid JSON: {exc}") from exc
 
