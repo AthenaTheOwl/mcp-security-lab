@@ -11,7 +11,11 @@ HIGH_OR_CRITICAL = {"high", "critical"}
 
 def load_report(path: Path) -> dict[str, Any]:
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise ValueError(f"{path}: cannot read ({exc.strerror})") from exc
+    try:
+        data = json.loads(text)
     except json.JSONDecodeError as exc:
         raise ValueError(f"{path} is not valid JSON: {exc}") from exc
     if not isinstance(data, dict):

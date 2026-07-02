@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-05-25T00:04:00+00:00",
+  "source": "current-inplace-escalation.json",
+  "summary": {
+    "server_count": 1,
+    "max_score": 85,
+    "risk_counts": {
+      "low": 0,
+      "medium": 0,
+      "high": 0,
+      "critical": 1
+    }
+  },
+  "servers": [
+    {
+      "name": "docs-readonly",
+      "risk_score": 85,
+      "risk_level": "critical",
+      "transport": "stdio",
+      "read_only": false,
+      "findings": [
+        {
+          "rule_id": "STDIO-COMMAND",
+          "severity": "high",
+          "message": "server starts a local command",
+          "evidence": "command",
+          "score_delta": 60
+        }
+      ],
+      "injection_matches": [],
+      "policy": {
+        "verdict": "deny",
+        "reasons": [
+          "Local command server has broad filesystem or wildcard access."
+        ],
+        "matched_rules": [],
+        "tools": [
+          {
+            "name": "read_doc",
+            "verdict": "allow",
+            "reasons": [
+              "Tool does not match policy-controlled access patterns."
+            ],
+            "matched_rules": []
+          }
+        ]
+      }
+    }
+  ]
+}

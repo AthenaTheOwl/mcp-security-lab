@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 
 from mcp_security_lab.cli import main
-from mcp_security_lab.config import load_servers
-from mcp_security_lab.policy import load_policy, policy_has_deny
+from mcp_security_lab.config import ServerConfig, load_servers
+from mcp_security_lab.policy import evaluate_policy_for_server, load_policy, policy_has_deny
 from mcp_security_lab.report import build_report, render_markdown
 
 
@@ -95,6 +95,54 @@ def test_cli_fail_on_deny_returns_nonzero_and_writes_report(tmp_path) -> None:
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     assert payload["servers"][0]["policy"]["verdict"] == "deny"
     assert report_path.with_suffix(".md").is_file()
+
+
+def _scored(**overrides: object) -> dict[str, object]:
+    scored: dict[str, object] = {
+        "risk_score": 0,
+        "risk_level": "low",
+        "transport": "stdio",
+        "read_only": False,
+        "findings": [],
+        "injection_matches": [],
+    }
+    scored.update(overrides)
+    return scored
+
+
+def _evaluate(rule_match: dict[str, object], default_verdict: str, scored: dict[str, object]) -> str:
+    policy = {
+        "server_rules": [
+            {"id": "rule", "verdict": "deny", "reason": "matched", "match": rule_match}
+        ],
+        "server_default": {"verdict": default_verdict, "reason": "default"},
+    }
+    server = ServerConfig("s", {"tools": []})
+    return evaluate_policy_for_server(policy, server, scored)["verdict"]
+
+
+def test_risk_score_gte_matcher_boundary() -> None:
+    # risk_score_gte is unused in default.yaml; pin the >= boundary directly.
+    match = {"risk_score_gte": 50}
+    assert _evaluate(match, "allow", _scored(risk_score=49)) == "allow"
+    assert _evaluate(match, "allow", _scored(risk_score=50)) == "deny"
+
+
+def test_findings_none_matcher_blocks_on_listed_finding() -> None:
+    # findings_none must veto the match when a listed finding is present,
+    # independent of any co-located read_only guard.
+    match = {"findings_none": ["STDIO-COMMAND"]}
+    clean = _scored(findings=[])
+    dirty = _scored(findings=[{"rule_id": "STDIO-COMMAND"}])
+    assert _evaluate(match, "allow", clean) == "deny"
+    assert _evaluate(match, "allow", dirty) == "allow"
+
+
+def test_read_only_matcher_distinguishes_read_only_servers() -> None:
+    # read_only:true must match a read-only server and not a writable one.
+    match = {"read_only": True}
+    assert _evaluate(match, "allow", _scored(read_only=True)) == "deny"
+    assert _evaluate(match, "allow", _scored(read_only=False)) == "allow"
 
 
 def _matched_findings(policy_result: dict[str, object]) -> set[str]:

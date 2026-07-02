@@ -81,7 +81,16 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    try:
+        return _run(args, parser)
+    except (ValueError, RuntimeError, OSError) as exc:
+        # A bad or unreadable input path/config should exit with a clear message
+        # instead of dumping a traceback.
+        parser.error(str(exc))
+        return 2
 
+
+def _run(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     if args.command == "scan":
         servers = load_servers(args.config)
         policy = load_policy(args.policy) if args.policy else None
@@ -109,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
                 policy_source=DEFAULT_SHOW_POLICY if policy is not None else None,
             )
         else:
-            raise FileNotFoundError(report_path)
+            raise ValueError(f"{report_path}: report not found")
         print(render_show(report), end="")
         return 0
 
