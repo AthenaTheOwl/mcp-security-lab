@@ -22,3 +22,4 @@
 | R-MCPSEC-011 | `.agents/AGENTS.md` (Systems-thinking discipline section) | DEC-MCPSEC-009-systems-thinking-discipline-adoption |
 | R-MCPSEC-012 | `scripts/validate_decisions.py` (check_systems_thinking_fields, SYSTEMS_THINKING_FIELDS) | DEC-MCPSEC-009-systems-thinking-discipline-adoption |
 | R-MCPSEC-013 | `decisions/DEC-MCPSEC-006-baseline-current-diff-gate.md`, `decisions/DEC-MCPSEC-007-athena-mcp-surface-drift-gate.md`, `decisions/DEC-MCPSEC-008-mcp-server-agnostic-drift-gate.md` | DEC-MCPSEC-009-systems-thinking-discipline-adoption |
+| R-MCPSEC-EVAL-001 | `mcp_security_lab/eval.py`, `scripts/generate_eval_scorecard.py`, `eval/corpus/*.json`, `eval/manifest.json`, `eval/labels.json`, `reports/eval-scorecard.json`, `reports/eval-scorecard.md`, `tests/test_eval_scorecard.py` | DEC-MCPSEC-010-real-config-eval-scorecard |

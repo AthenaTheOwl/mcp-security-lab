@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "remote-example": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://remote.mcp.server/sse"
+      ]
+    }
+  }
+}

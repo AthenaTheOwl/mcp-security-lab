@@ -1,0 +1,222 @@
+{
+  "description": "Hand-labelled ground truth per scanner category per server. T = the risk is genuinely present in the config as written; labelled conservatively. Category order in each row: COMMAND_EXECUTION, BROAD_FILESYSTEM, UNAUTH_REMOTE, PROMPT_INJECTION.",
+  "categories": [
+    "COMMAND_EXECUTION",
+    "BROAD_FILESYSTEM",
+    "UNAUTH_REMOTE",
+    "PROMPT_INJECTION"
+  ],
+  "category_definitions": {
+    "COMMAND_EXECUTION": "Config causes a local process/command to start (stdio server).",
+    "BROAD_FILESYSTEM": "Config grants filesystem access to an entire user home dir, a filesystem root (/, C:\\), or via a path wildcard (*).",
+    "UNAUTH_REMOTE": "Config declares a remote (URL/HTTP/SSE) MCP transport and carries NO in-config auth material (Authorization header / token).",
+    "PROMPT_INJECTION": "Config descriptor text (names/descriptions/prompts) contains prompt- or tool-injection language."
+  },
+  "ambiguous_cases": {
+    "05-git-docker-home-mount": "Docker bind-mount of the whole $HOME. Labelled BROAD_FILESYSTEM TRUE (exposes all of home), though a git tool nominally scopes to repos.",
+    "22-mcp-remote-sse-noauth": "Remote SSE transport expressed via a stdio proxy command. Labelled UNAUTH_REMOTE TRUE (unauthenticated remote endpoint) and COMMAND_EXECUTION TRUE (a local npx process does start).",
+    "24-github-remote-http-oauth": "OAuth is negotiated at runtime; the config file itself carries no auth material, so UNAUTH_REMOTE TRUE by the in-config definition."
+  },
+  "labels": {
+    "01-filesystem-npx": {
+      "filesystem": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "02-filesystem-docker": {
+      "filesystem": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "03-filesystem-vscode-workspace": {
+      "filesystem": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "04-git-uvx": {
+      "git": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "05-git-docker-home-mount": {
+      "git": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": true,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "06-fetch-uvx": {
+      "fetch": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "07-fetch-windows-env": {
+      "fetch": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "08-memory-npx": {
+      "memory": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "09-memory-custom-path": {
+      "memory": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "10-time-uvx": {
+      "time": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "11-sequentialthinking-npx": {
+      "sequential-thinking": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "12-everything-npx": {
+      "everything": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "13-github-npx-token": {
+      "github": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "14-slack-npx-token": {
+      "slack": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "15-postgres-npx-localhost": {
+      "postgres": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "16-postgres-docker": {
+      "postgres": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "17-brave-search-npx-key": {
+      "brave-search": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "18-google-maps-npx-key": {
+      "google-maps": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "19-sqlite-uv-dbpath": {
+      "sqlite": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "20-puppeteer-npx": {
+      "puppeteer": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "21-puppeteer-advanced-dangerous": {
+      "mcp-puppeteer": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "22-mcp-remote-sse-noauth": {
+      "remote-example": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": true,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "23-mcp-remote-sse-authheader": {
+      "remote-example": {
+        "COMMAND_EXECUTION": true,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "24-github-remote-http-oauth": {
+      "github": {
+        "COMMAND_EXECUTION": false,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": true,
+        "PROMPT_INJECTION": false
+      }
+    },
+    "25-github-remote-http-pat": {
+      "github": {
+        "COMMAND_EXECUTION": false,
+        "BROAD_FILESYSTEM": false,
+        "UNAUTH_REMOTE": false,
+        "PROMPT_INJECTION": false
+      }
+    }
+  }
+}
