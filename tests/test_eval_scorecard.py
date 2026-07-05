@@ -60,14 +60,14 @@ def test_headline_numbers_are_legible() -> None:
     overall = card["overall"]
     assert overall["fp"] == 0, "scanner should raise no false alarms on the real corpus"
     assert overall["precision"] == 1.0
-    assert overall["recall"] == 0.9231
-    assert overall["tp"] == 24 and overall["fn"] == 2
+    assert overall["recall"] == 1.0
+    assert overall["tp"] == 26 and overall["fn"] == 0
 
     per = card["per_category"]
     assert per["COMMAND_EXECUTION"]["precision"] == 1.0
     assert per["COMMAND_EXECUTION"]["recall"] == 1.0
-    assert per["UNAUTH_REMOTE"]["recall"] == 0.5
-    assert per["BROAD_FILESYSTEM"]["recall"] == 0.0
+    assert per["UNAUTH_REMOTE"]["recall"] == 1.0
+    assert per["BROAD_FILESYSTEM"]["recall"] == 1.0
     # PROMPT_INJECTION has no positive support in real config files.
     assert per["PROMPT_INJECTION"]["support_positive"] == 0
     assert per["PROMPT_INJECTION"]["precision"] is None

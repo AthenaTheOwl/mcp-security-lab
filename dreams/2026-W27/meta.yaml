@@ -1,0 +1,13 @@
+week: 2026-W27
+generated_at: 2026-07-05T14:00:00Z
+generated_by: codex-recall-gap-pass
+scope:
+  repos:
+    - mcp-security-lab
+  lookback_days: 1
+  sources:
+    - eval_reports
+    - scanner_tests
+modes:
+  - failure_clustering
+report_path: dreams/2026-W27/report.md
