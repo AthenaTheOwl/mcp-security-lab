@@ -97,6 +97,39 @@ package, whether the auth is valid, hidden text returned after connection, and
 network-destination safety past the static URL are all outside what a config can
 tell you, and the tool says so rather than pretending otherwise.
 
+## Measured against real configs
+
+The scanner is graded against 25 real, publicly documented MCP configs — not
+just self-authored fixtures. The corpus is verbatim from
+`modelcontextprotocol/servers` (12), `modelcontextprotocol/servers-archived`
+(9), `geelen/mcp-remote` (2), and `github/github-mcp-server` (2), with a
+provenance manifest (`eval/manifest.json`) and hand-labelled ground truth
+(`eval/labels.json`). The scorecard is deterministic and pinned by a test, so a
+scanner change that shifts the numbers fails CI.
+
+| Category | Rule | Precision | Recall | FP | FN |
+| --- | --- | ---: | ---: | ---: | ---: |
+| command execution | `STDIO-COMMAND` | 100% | 100% | 0 | 0 |
+| broad filesystem | `BROAD-ACCESS` | n/a | 0% | 0 | 1 |
+| unauth remote | `REMOTE-NO-AUTH` | 100% | 50% | 0 | 1 |
+| prompt injection | `INJECTION-CORPUS` | n/a | n/a | 0 | 0 |
+| **overall (micro)** | — | **100%** | **92%** | **0** | **2** |
+
+Zero false positives across the four decision categories. The two misses are
+recall gaps where a real config expresses risk in a form the narrow rule does
+not parse:
+
+- a docker bind-mount of the whole home dir (`src=/Users/username`) — `BROAD-ACCESS`
+  matches only bare wildcard/root strings, not mount specs;
+- a remote SSE endpoint reached through the `mcp-remote` stdio proxy (URL in
+  `args`) — `REMOTE-NO-AUTH` inspects only `url`/`endpoint`/`transport` fields.
+
+Prompt injection has zero attack surface in a real `claude_desktop_config.json`,
+which carries only `command`/`args`/`env` and no tool text — the injection risk
+lives in runtime tool metadata, outside static-config scope. Full scorecard with
+per-finding diagnosis: `reports/eval-scorecard.md`. Regenerate with
+`python scripts/generate_eval_scorecard.py`.
+
 ## Run it
 
 ```powershell
@@ -157,6 +190,7 @@ python scripts/validate_dreams.py
 python scripts/check_schema_cache_freshness.py
 python -m mcp_security_lab scan examples/claude-desktop-config.json --policy examples/policies/default.yaml --out reports/example.json
 python -m mcp_security_lab diff --baseline tests/fixtures/diff-baseline-report.json --current tests/fixtures/diff-current-clean-report.json --out reports/example-diff.json --fail-on-new-critical --fail-on-new-deny
+python scripts/generate_eval_scorecard.py
 ```
 
 ## License

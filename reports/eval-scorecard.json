@@ -1,0 +1,95 @@
+{
+  "scorecard_version": "1.0",
+  "corpus": {
+    "name": "real-public-mcp-configs",
+    "config_count": 25,
+    "server_count": 25,
+    "curated_at": "2026-07-05",
+    "source_breakdown": {
+      "modelcontextprotocol/servers": 12,
+      "modelcontextprotocol/servers-archived": 9,
+      "geelen/mcp-remote": 2,
+      "github/github-mcp-server": 2
+    }
+  },
+  "categories": [
+    "COMMAND_EXECUTION",
+    "BROAD_FILESYSTEM",
+    "UNAUTH_REMOTE",
+    "PROMPT_INJECTION"
+  ],
+  "category_rule_map": {
+    "COMMAND_EXECUTION": "STDIO-COMMAND",
+    "BROAD_FILESYSTEM": "BROAD-ACCESS",
+    "UNAUTH_REMOTE": "REMOTE-NO-AUTH",
+    "PROMPT_INJECTION": "INJECTION-CORPUS"
+  },
+  "per_category": {
+    "COMMAND_EXECUTION": {
+      "tp": 23,
+      "fp": 0,
+      "fn": 0,
+      "tn": 2,
+      "support_positive": 23,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "BROAD_FILESYSTEM": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "tn": 24,
+      "support_positive": 1,
+      "precision": null,
+      "recall": 0.0,
+      "f1": null
+    },
+    "UNAUTH_REMOTE": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "tn": 23,
+      "support_positive": 2,
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.6667
+    },
+    "PROMPT_INJECTION": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "tn": 25,
+      "support_positive": 0,
+      "precision": null,
+      "recall": null,
+      "f1": null
+    }
+  },
+  "overall": {
+    "tp": 24,
+    "fp": 0,
+    "fn": 2,
+    "tn": 74,
+    "precision": 1.0,
+    "recall": 0.9231,
+    "f1": 0.96
+  },
+  "false_positives": [],
+  "false_negatives": [
+    {
+      "config": "05-git-docker-home-mount",
+      "server": "git",
+      "category": "BROAD_FILESYSTEM",
+      "rule": "BROAD-ACCESS",
+      "diagnosis": "MISS: docker bind-mount `src=/Users/username` exposes the whole $HOME, but BROAD-ACCESS only matches bare wildcard/root strings, never mount specs or path prefixes."
+    },
+    {
+      "config": "22-mcp-remote-sse-noauth",
+      "server": "remote-example",
+      "category": "UNAUTH_REMOTE",
+      "rule": "REMOTE-NO-AUTH",
+      "diagnosis": "MISS: the remote SSE URL sits in `args` behind the `mcp-remote` proxy; REMOTE-NO-AUTH only inspects `url`/`endpoint`/`transport` fields, so a remote endpoint reached via a stdio proxy is scored as a plain local command."
+    }
+  ]
+}

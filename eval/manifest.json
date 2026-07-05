@@ -1,0 +1,367 @@
+{
+  "corpus_name": "real-public-mcp-configs",
+  "description": "Verbatim, publicly documented MCP server configurations gathered to score the static scanner against real-world inputs (not self-authored synthetic fixtures).",
+  "curated_at": "2026-07-05",
+  "public_sources_only": true,
+  "secret_placeholders_note": "All token/key values are the upstream documentation placeholders; no real secrets are stored.",
+  "config_count": 25,
+  "server_count": 25,
+  "source_breakdown": {
+    "modelcontextprotocol/servers": 12,
+    "modelcontextprotocol/servers-archived": 9,
+    "geelen/mcp-remote": 2,
+    "github/github-mcp-server": 2
+  },
+  "entries": [
+    {
+      "id": "01-filesystem-npx",
+      "file": "corpus/01-filesystem-npx.json",
+      "server_names": [
+        "filesystem"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"filesystem\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-filesystem\",\"/Users/username/Desktop\",\"/path/to/other/allowed/dir\"]}}}",
+      "notes": "Filesystem server scoped to two explicit directories (Desktop + one allowed dir)."
+    },
+    {
+      "id": "02-filesystem-docker",
+      "file": "corpus/02-filesystem-docker.json",
+      "server_names": [
+        "filesystem"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md",
+      "variant": "Claude Desktop, docker",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"filesystem\":{\"command\":\"docker\",\"args\":[\"run\",\"-i\",\"--rm\",\"--mount\",\"type=bind,src=/Users/username/Desktop,dst=/projects/Desktop\",\"--mount\",\"type=bind,src=/path/to/other/allowed/dir,dst=/projects/other/allowed/dir,ro\",\"--mount\",\"type=bind,src=/path/to/file.txt,dst=/projects/path/to/file.txt\",\"mcp/filesystem\",\"/projects\"]}}}",
+      "notes": "Docker filesystem server; scope expressed via bind-mounts of specific dirs/files."
+    },
+    {
+      "id": "03-filesystem-vscode-workspace",
+      "file": "corpus/03-filesystem-vscode-workspace.json",
+      "server_names": [
+        "filesystem"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md",
+      "variant": "VS Code, servers shape, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"servers\":{\"filesystem\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-filesystem\",\"${workspaceFolder}\"]}}}",
+      "notes": "`servers` (not mcpServers) shape; scoped to the editor workspace folder."
+    },
+    {
+      "id": "04-git-uvx",
+      "file": "corpus/04-git-uvx.json",
+      "server_names": [
+        "git"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/git/README.md",
+      "variant": "Claude Desktop, uvx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"git\":{\"command\":\"uvx\",\"args\":[\"mcp-server-git\",\"--repository\",\"path/to/git/repo\"]}}}",
+      "notes": "Git server scoped to one repository path."
+    },
+    {
+      "id": "05-git-docker-home-mount",
+      "file": "corpus/05-git-docker-home-mount.json",
+      "server_names": [
+        "git"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/git/README.md",
+      "variant": "Claude Desktop, docker",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"git\":{\"command\":\"docker\",\"args\":[\"run\",\"--rm\",\"-i\",\"--mount\",\"type=bind,src=/Users/username,dst=/Users/username\",\"mcp/git\"]}}}",
+      "notes": "Docker git server bind-mounts the ENTIRE user home dir (/Users/username) into the container. AMBIGUOUS: labelled broad-filesystem TRUE because the mount exposes all of $HOME, though a git tool nominally touches only repos."
+    },
+    {
+      "id": "06-fetch-uvx",
+      "file": "corpus/06-fetch-uvx.json",
+      "server_names": [
+        "fetch"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/fetch/README.md",
+      "variant": "Claude Desktop, uvx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"fetch\":{\"command\":\"uvx\",\"args\":[\"mcp-server-fetch\"]}}}",
+      "notes": "Web-fetch server; MCP transport is local stdio (outbound HTTP is downstream)."
+    },
+    {
+      "id": "07-fetch-windows-env",
+      "file": "corpus/07-fetch-windows-env.json",
+      "server_names": [
+        "fetch"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/fetch/README.md",
+      "variant": "Windows, uvx + PYTHONIOENCODING",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"fetch\":{\"command\":\"uvx\",\"args\":[\"mcp-server-fetch\"],\"env\":{\"PYTHONIOENCODING\":\"utf-8\"}}}}",
+      "notes": "Same fetch server with a benign encoding env var."
+    },
+    {
+      "id": "08-memory-npx",
+      "file": "corpus/08-memory-npx.json",
+      "server_names": [
+        "memory"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"memory\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-memory\"]}}}",
+      "notes": "Knowledge-graph memory server, default persistence path."
+    },
+    {
+      "id": "09-memory-custom-path",
+      "file": "corpus/09-memory-custom-path.json",
+      "server_names": [
+        "memory"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md",
+      "variant": "Claude Desktop, npx + MEMORY_FILE_PATH",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"memory\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-memory\"],\"env\":{\"MEMORY_FILE_PATH\":\"/path/to/custom/memory.jsonl\"}}}}",
+      "notes": "Memory server with an explicit single-file persistence path."
+    },
+    {
+      "id": "10-time-uvx",
+      "file": "corpus/10-time-uvx.json",
+      "server_names": [
+        "time"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/time/README.md",
+      "variant": "Claude Desktop, uvx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"time\":{\"command\":\"uvx\",\"args\":[\"mcp-server-time\"]}}}",
+      "notes": "Time/timezone server; no filesystem, network, or secret surface."
+    },
+    {
+      "id": "11-sequentialthinking-npx",
+      "file": "corpus/11-sequentialthinking-npx.json",
+      "server_names": [
+        "sequential-thinking"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/sequentialthinking/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"sequential-thinking\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-sequential-thinking\"]}}}",
+      "notes": "Pure reasoning-aid server; no external surface."
+    },
+    {
+      "id": "12-everything-npx",
+      "file": "corpus/12-everything-npx.json",
+      "server_names": [
+        "everything"
+      ],
+      "source_repo": "modelcontextprotocol/servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers/blob/main/src/everything/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"everything\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-everything\"]}}}",
+      "notes": "Reference/test server. Its tools (printEnv, etc.) are NOT in the config file."
+    },
+    {
+      "id": "13-github-npx-token",
+      "file": "corpus/13-github-npx-token.json",
+      "server_names": [
+        "github"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/github/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"github\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-github\"],\"env\":{\"GITHUB_PERSONAL_ACCESS_TOKEN\":\"<YOUR_TOKEN>\"}}}}",
+      "notes": "GitHub API server; PAT provided via env placeholder."
+    },
+    {
+      "id": "14-slack-npx-token",
+      "file": "corpus/14-slack-npx-token.json",
+      "server_names": [
+        "slack"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/slack/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"slack\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-slack\"],\"env\":{\"SLACK_BOT_TOKEN\":\"xoxb-your-bot-token\",\"SLACK_TEAM_ID\":\"T01234567\",\"SLACK_CHANNEL_IDS\":\"C01234567, C76543210\"}}}}",
+      "notes": "Slack server; bot token + team/channel ids via env placeholders."
+    },
+    {
+      "id": "15-postgres-npx-localhost",
+      "file": "corpus/15-postgres-npx-localhost.json",
+      "server_names": [
+        "postgres"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/postgres/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"postgres\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-postgres\",\"postgresql://localhost/mydb\"]}}}",
+      "notes": "Read-only Postgres server; connection string passed as a positional arg."
+    },
+    {
+      "id": "16-postgres-docker",
+      "file": "corpus/16-postgres-docker.json",
+      "server_names": [
+        "postgres"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/postgres/README.md",
+      "variant": "Claude Desktop, docker",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"postgres\":{\"command\":\"docker\",\"args\":[\"run\",\"-i\",\"--rm\",\"mcp/postgres\",\"postgresql://host.docker.internal:5432/mydb\"]}}}",
+      "notes": "Docker Postgres server; connection string as arg."
+    },
+    {
+      "id": "17-brave-search-npx-key",
+      "file": "corpus/17-brave-search-npx-key.json",
+      "server_names": [
+        "brave-search"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/brave-search/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"brave-search\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-brave-search\"],\"env\":{\"BRAVE_API_KEY\":\"YOUR_API_KEY_HERE\"}}}}",
+      "notes": "Web-search server; API key via env placeholder. Network egress not visible in config."
+    },
+    {
+      "id": "18-google-maps-npx-key",
+      "file": "corpus/18-google-maps-npx-key.json",
+      "server_names": [
+        "google-maps"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/google-maps/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"google-maps\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-google-maps\"],\"env\":{\"GOOGLE_MAPS_API_KEY\":\"<YOUR_API_KEY>\"}}}}",
+      "notes": "Google Maps server; API key via env placeholder."
+    },
+    {
+      "id": "19-sqlite-uv-dbpath",
+      "file": "corpus/19-sqlite-uv-dbpath.json",
+      "server_names": [
+        "sqlite"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/sqlite/README.md",
+      "variant": "Claude Desktop, uv",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"sqlite\":{\"command\":\"uv\",\"args\":[\"--directory\",\"parent_of_servers_repo/servers/src/sqlite\",\"run\",\"mcp-server-sqlite\",\"--db-path\",\"~/test.db\"]}}}",
+      "notes": "SQLite server pointed at a single db file under $HOME."
+    },
+    {
+      "id": "20-puppeteer-npx",
+      "file": "corpus/20-puppeteer-npx.json",
+      "server_names": [
+        "puppeteer"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/puppeteer/README.md",
+      "variant": "Claude Desktop, npx",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"puppeteer\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-puppeteer\"]}}}",
+      "notes": "Headless-browser automation server. Package name carries no scanner keyword."
+    },
+    {
+      "id": "21-puppeteer-advanced-dangerous",
+      "file": "corpus/21-puppeteer-advanced-dangerous.json",
+      "server_names": [
+        "mcp-puppeteer"
+      ],
+      "source_repo": "modelcontextprotocol/servers-archived",
+      "source_url": "https://github.com/modelcontextprotocol/servers-archived/blob/main/src/puppeteer/README.md",
+      "variant": "Claude Desktop, npx + launch options",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; secret values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"mcpServers\":{\"mcp-puppeteer\":{\"command\":\"npx\",\"args\":[\"-y\",\"@modelcontextprotocol/server-puppeteer\"],\"env\":{\"PUPPETEER_LAUNCH_OPTIONS\":\"{ \\\"headless\\\": false, \\\"executablePath\\\": \\\"C:/Program Files/Google/Chrome/Application/chrome.exe\\\", \\\"args\\\": [] }\",\"ALLOW_DANGEROUS\":\"true\"}}}}",
+      "notes": "Browser server with ALLOW_DANGEROUS=true and a real Chrome exe path in env."
+    },
+    {
+      "id": "22-mcp-remote-sse-noauth",
+      "file": "corpus/22-mcp-remote-sse-noauth.json",
+      "server_names": [
+        "remote-example"
+      ],
+      "source_repo": "geelen/mcp-remote",
+      "source_url": "https://github.com/geelen/mcp-remote/blob/main/README.md",
+      "variant": "Claude Desktop, mcp-remote proxy",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation.",
+      "verbatim_snippet": "{\"mcpServers\":{\"remote-example\":{\"command\":\"npx\",\"args\":[\"mcp-remote\",\"https://remote.mcp.server/sse\"]}}}",
+      "notes": "Remote SSE endpoint reached via the mcp-remote stdio proxy, NO auth header. AMBIGUOUS transport: a remote transport expressed through a local stdio command. Labelled unauth-remote TRUE (the config wires the agent to an unauthenticated remote MCP endpoint)."
+    },
+    {
+      "id": "23-mcp-remote-sse-authheader",
+      "file": "corpus/23-mcp-remote-sse-authheader.json",
+      "server_names": [
+        "remote-example"
+      ],
+      "source_repo": "geelen/mcp-remote",
+      "source_url": "https://github.com/geelen/mcp-remote/blob/main/README.md",
+      "variant": "Claude Desktop, mcp-remote proxy + header",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation.",
+      "verbatim_snippet": "{\"mcpServers\":{\"remote-example\":{\"command\":\"npx\",\"args\":[\"mcp-remote\",\"https://remote.mcp.server/sse\",\"--header\",\"Authorization: Bearer ${AUTH_TOKEN}\"],\"env\":{\"AUTH_TOKEN\":\"...\"}}}}",
+      "notes": "Same remote SSE endpoint WITH an Authorization bearer header -> authenticated."
+    },
+    {
+      "id": "24-github-remote-http-oauth",
+      "file": "corpus/24-github-remote-http-oauth.json",
+      "server_names": [
+        "github"
+      ],
+      "source_repo": "github/github-mcp-server",
+      "source_url": "https://github.com/github/github-mcp-server/blob/main/README.md",
+      "variant": "Remote GitHub MCP, native url (OAuth)",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; token values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"servers\":{\"github\":{\"type\":\"http\",\"url\":\"https://api.githubcopilot.com/mcp/\"}}}",
+      "notes": "Native remote HTTP transport, no in-config auth material (OAuth negotiated out-of-band at runtime)."
+    },
+    {
+      "id": "25-github-remote-http-pat",
+      "file": "corpus/25-github-remote-http-pat.json",
+      "server_names": [
+        "github"
+      ],
+      "source_repo": "github/github-mcp-server",
+      "source_url": "https://github.com/github/github-mcp-server/blob/main/README.md",
+      "variant": "Remote GitHub MCP, native url + PAT header",
+      "fetched_at": "2026-07-05",
+      "license_note": "MIT (upstream repo LICENSE). Configuration example reproduced for evaluation; token values kept as upstream placeholders.",
+      "verbatim_snippet": "{\"servers\":{\"github\":{\"type\":\"http\",\"url\":\"https://api.githubcopilot.com/mcp/\",\"headers\":{\"Authorization\":\"Bearer ${input:github_mcp_pat}\"}}},\"inputs\":[{\"type\":\"promptString\",\"id\":\"github_mcp_pat\",\"description\":\"GitHub Personal Access Token\",\"password\":true}]}",
+      "notes": "Native remote HTTP transport WITH an Authorization header -> authenticated in config."
+    }
+  ]
+}
