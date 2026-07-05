@@ -99,6 +99,119 @@ def test_remote_without_auth_is_elevated() -> None:
     assert any(finding["rule_id"] == "REMOTE-NO-AUTH" for finding in result["findings"])
 
 
+def test_http_type_without_auth_is_elevated() -> None:
+    result = score_server(ServerConfig("remote", {"type": "http", "url": "https://example.com/mcp"}))
+
+    assert any(finding["rule_id"] == "REMOTE-NO-AUTH" for finding in result["findings"])
+
+
+def test_mcp_remote_proxy_url_without_auth_is_elevated() -> None:
+    result = score_server(
+        ServerConfig(
+            "remote-proxy",
+            {
+                "command": "npx",
+                "args": ["mcp-remote", "https://remote.mcp.server/sse"],
+            },
+        )
+    )
+
+    assert any(finding["rule_id"] == "REMOTE-NO-AUTH" for finding in result["findings"])
+
+
+def test_mcp_remote_proxy_with_auth_metadata_is_not_remote_no_auth() -> None:
+    result = score_server(
+        ServerConfig(
+            "remote-proxy-auth",
+            {
+                "command": "npx",
+                "args": [
+                    "mcp-remote",
+                    "https://remote.mcp.server/sse",
+                    "--header",
+                    "Authorization: Bearer ${AUTH_TOKEN}",
+                ],
+                "env": {"AUTH_TOKEN": "..."},
+            },
+        )
+    )
+
+    assert not any(finding["rule_id"] == "REMOTE-NO-AUTH" for finding in result["findings"])
+
+
+def test_non_proxy_url_arg_does_not_trigger_remote_no_auth() -> None:
+    result = score_server(
+        ServerConfig(
+            "local-doc",
+            {
+                "command": "npx",
+                "args": ["local-tool", "https://docs.example.com/reference"],
+            },
+        )
+    )
+
+    assert not any(finding["rule_id"] == "REMOTE-NO-AUTH" for finding in result["findings"])
+
+
+def test_docker_bind_mount_of_home_is_broad_access() -> None:
+    result = score_server(
+        ServerConfig(
+            "docker-git",
+            {
+                "command": "docker",
+                "args": [
+                    "run",
+                    "--mount",
+                    "type=bind,src=/Users/username,dst=/Users/username",
+                    "mcp/git",
+                ],
+            },
+        )
+    )
+
+    broad = [finding for finding in result["findings"] if finding["rule_id"] == "BROAD-ACCESS"]
+    assert broad
+    assert "mount.src=/Users/username" in broad[0]["evidence"]
+
+
+def test_project_scoped_docker_bind_mount_is_not_broad_access() -> None:
+    result = score_server(
+        ServerConfig(
+            "docker-project",
+            {
+                "command": "docker",
+                "args": [
+                    "run",
+                    "--mount",
+                    "type=bind,src=/work/project,dst=/workspace",
+                    "mcp/git",
+                ],
+            },
+        )
+    )
+
+    assert not any(finding["rule_id"] == "BROAD-ACCESS" for finding in result["findings"])
+
+
+def test_specific_user_subdirectory_mount_is_not_broad_access() -> None:
+    result = score_server(
+        ServerConfig(
+            "docker-desktop",
+            {
+                "command": "docker",
+                "args": [
+                    "run",
+                    "--mount",
+                    "type=bind,src=/Users/username/Desktop,dst=/projects/Desktop",
+                    "mcp/filesystem",
+                ],
+            },
+        )
+    )
+
+    assert not any(finding["rule_id"] == "BROAD-ACCESS" for finding in result["findings"])
+
+
 def test_readonly_resource_lowers_score() -> None:
     result = score_server(
         ServerConfig(

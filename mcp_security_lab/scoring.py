@@ -107,8 +107,14 @@ def _has_stdio_command(raw: dict[str, Any]) -> bool:
 
 def _remote_url_without_auth(raw: dict[str, Any]) -> bool:
     transport = str(raw.get("transport", "")).lower()
-    has_remote = any(isinstance(raw.get(key), str) and raw[key].startswith(("http://", "https://")) for key in ("url", "endpoint"))
+    server_type = str(raw.get("type", "")).lower()
+    has_remote = any(
+        isinstance(raw.get(key), str) and raw[key].startswith(("http://", "https://"))
+        for key in ("url", "endpoint")
+    )
     has_remote = has_remote or transport in {"http", "https", "sse", "streamable_http", "remote"}
+    has_remote = has_remote or server_type in {"http", "https", "sse", "streamable_http", "remote"}
+    has_remote = has_remote or _has_remote_proxy_url(raw)
     if not has_remote:
         return False
     return not _has_auth_metadata(raw)
@@ -148,7 +154,69 @@ def _broad_access_hits(raw: dict[str, Any]) -> list[str]:
             hits.append(stripped)
         if stripped.lower() in {"c:\\users", "c:/users", "/users", "/home"}:
             hits.append(stripped)
+        mount_hit = _broad_mount_source(stripped)
+        if mount_hit is not None:
+            hits.append(mount_hit)
     return hits
+
+
+def _has_remote_proxy_url(raw: dict[str, Any]) -> bool:
+    """Detect remote endpoints hidden behind stdio proxy commands.
+
+    Real-world configs often run ``npx mcp-remote https://...``. That is still
+    a remote MCP endpoint even though the top-level transport is local stdio.
+    Keep this intentionally narrow: a random URL in a description should not
+    become a transport finding.
+    """
+    args = raw.get("args")
+    if not isinstance(args, list):
+        return False
+    arg_texts = [str(arg) for arg in args]
+    command = str(raw.get("command", ""))
+    has_proxy = "mcp-remote" in command or any("mcp-remote" in arg for arg in arg_texts)
+    if not has_proxy:
+        return False
+    return any(arg.startswith(("http://", "https://")) for arg in arg_texts)
+
+
+def _broad_mount_source(value: str) -> str | None:
+    """Return the broad source path from a docker-style mount argument.
+
+    Supports ``--mount type=bind,src=/Users/name,dst=/container`` and the
+    shorter volume form ``/Users/name:/container``. Only root/home-style
+    sources count; project-scoped paths stay quiet to preserve precision.
+    """
+    source: str | None = None
+    if "type=bind" in value and ("," in value or "=" in value):
+        for part in value.split(","):
+            key, sep, raw_part_value = part.partition("=")
+            if sep and key.strip().lower() in {"src", "source"}:
+                source = raw_part_value.strip()
+                break
+    elif ":" in value and not value.startswith(("http://", "https://")):
+        source = value.split(":", 1)[0].strip()
+
+    if not source:
+        return None
+    normalized = source.replace("\\", "/").rstrip("/")
+    lowered = normalized.lower()
+    if source in BROAD_PATHS or normalized in {"/", "~", "$HOME", "%USERPROFILE%"}:
+        return f"mount.src={source}"
+    if lowered in {"c:/users", "/users", "/home"}:
+        return f"mount.src={source}"
+    if _is_user_home_path(lowered):
+        return f"mount.src={source}"
+    return None
+
+
+def _is_user_home_path(path: str) -> bool:
+    normalized = path.strip("/")
+    parts = [part for part in normalized.split("/") if part]
+    if len(parts) == 2 and parts[0] in {"users", "home"}:
+        return True
+    if len(parts) == 3 and len(parts[0]) == 2 and parts[0][1] == ":" and parts[1] == "users":
+        return True
+    return False
 
 
 def _is_read_only_resource_server(raw: dict[str, Any]) -> bool:

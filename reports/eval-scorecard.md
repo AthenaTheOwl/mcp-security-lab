@@ -23,10 +23,10 @@ Each category maps to one scanner rule. A cell is one (config x server x categor
 | Category | Rule | TP | FP | FN | TN | support+ | Precision | Recall | F1 |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | COMMAND_EXECUTION | `STDIO-COMMAND` | 23 | 0 | 0 | 2 | 23 | 100.0% | 100.0% | 100.0% |
-| BROAD_FILESYSTEM | `BROAD-ACCESS` | 0 | 0 | 1 | 24 | 1 | n/a | 0.0% | n/a |
-| UNAUTH_REMOTE | `REMOTE-NO-AUTH` | 1 | 0 | 1 | 23 | 2 | 100.0% | 50.0% | 66.7% |
+| BROAD_FILESYSTEM | `BROAD-ACCESS` | 1 | 0 | 0 | 24 | 1 | 100.0% | 100.0% | 100.0% |
+| UNAUTH_REMOTE | `REMOTE-NO-AUTH` | 2 | 0 | 0 | 23 | 2 | 100.0% | 100.0% | 100.0% |
 | PROMPT_INJECTION | `INJECTION-CORPUS` | 0 | 0 | 0 | 25 | 0 | n/a | n/a | n/a |
-| **Overall (micro)** | — | 24 | 0 | 2 | 74 | 26 | 100.0% | 92.3% | 96.0% |
+| **Overall (micro)** | — | 26 | 0 | 0 | 74 | 26 | 100.0% | 100.0% | 100.0% |
 
 ## False positives
 
@@ -34,8 +34,7 @@ None. The scanner raised zero false alarms across the four decision categories o
 
 ## False negatives
 
-- `05-git-docker-home-mount` / git [BROAD_FILESYSTEM]: MISS: docker bind-mount `src=/Users/username` exposes the whole $HOME, but BROAD-ACCESS only matches bare wildcard/root strings, never mount specs or path prefixes.
-- `22-mcp-remote-sse-noauth` / remote-example [UNAUTH_REMOTE]: MISS: the remote SSE URL sits in `args` behind the `mcp-remote` proxy; REMOTE-NO-AUTH only inspects `url`/`endpoint`/`transport` fields, so a remote endpoint reached via a stdio proxy is scored as a plain local command.
+None.
 
 ## Ground-truth definitions
 

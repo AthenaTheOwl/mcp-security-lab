@@ -36,24 +36,24 @@
       "f1": 1.0
     },
     "BROAD_FILESYSTEM": {
-      "tp": 0,
-      "fp": 0,
-      "fn": 1,
-      "tn": 24,
-      "support_positive": 1,
-      "precision": null,
-      "recall": 0.0,
-      "f1": null
-    },
-    "UNAUTH_REMOTE": {
       "tp": 1,
       "fp": 0,
-      "fn": 1,
+      "fn": 0,
+      "tn": 24,
+      "support_positive": 1,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "UNAUTH_REMOTE": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
       "tn": 23,
       "support_positive": 2,
       "precision": 1.0,
-      "recall": 0.5,
-      "f1": 0.6667
+      "recall": 1.0,
+      "f1": 1.0
     },
     "PROMPT_INJECTION": {
       "tp": 0,
@@ -67,29 +67,14 @@
     }
   },
   "overall": {
-    "tp": 24,
+    "tp": 26,
     "fp": 0,
-    "fn": 2,
+    "fn": 0,
     "tn": 74,
     "precision": 1.0,
-    "recall": 0.9231,
-    "f1": 0.96
+    "recall": 1.0,
+    "f1": 1.0
   },
   "false_positives": [],
-  "false_negatives": [
-    {
-      "config": "05-git-docker-home-mount",
-      "server": "git",
-      "category": "BROAD_FILESYSTEM",
-      "rule": "BROAD-ACCESS",
-      "diagnosis": "MISS: docker bind-mount `src=/Users/username` exposes the whole $HOME, but BROAD-ACCESS only matches bare wildcard/root strings, never mount specs or path prefixes."
-    },
-    {
-      "config": "22-mcp-remote-sse-noauth",
-      "server": "remote-example",
-      "category": "UNAUTH_REMOTE",
-      "rule": "REMOTE-NO-AUTH",
-      "diagnosis": "MISS: the remote SSE URL sits in `args` behind the `mcp-remote` proxy; REMOTE-NO-AUTH only inspects `url`/`endpoint`/`transport` fields, so a remote endpoint reached via a stdio proxy is scored as a plain local command."
-    }
-  ]
+  "false_negatives": []
 }
