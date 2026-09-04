@@ -78,3 +78,6 @@ jobs:
       - name: Example scan
         working-directory: mcp-security-lab
         run: python -m mcp_security_lab scan examples/claude-desktop-config.json --out reports/ci-example.json
+      - name: validate_data_conformance
+        working-directory: mcp-security-lab
+        run: python scripts/validate_data_conformance.py

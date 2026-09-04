@@ -42,12 +42,29 @@
     "summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["added", "removed", "changed", "unchanged"],
+      "required": [
+        "added",
+        "removed",
+        "changed",
+        "unchanged"
+      ],
       "properties": {
-        "added": {"type": "integer", "minimum": 0},
-        "removed": {"type": "integer", "minimum": 0},
-        "changed": {"type": "integer", "minimum": 0},
-        "unchanged": {"type": "integer", "minimum": 0}
+        "added": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "removed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "changed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unchanged": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
     "added_tools": {
@@ -55,11 +72,21 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "input_schema_hash"],
+        "required": [
+          "name",
+          "input_schema_hash"
+        ],
         "properties": {
-          "name": {"type": "string"},
-          "description": {"type": "string"},
-          "input_schema_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "input_schema_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
         }
       }
     },
@@ -68,11 +95,21 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "input_schema_hash"],
+        "required": [
+          "name",
+          "input_schema_hash"
+        ],
         "properties": {
-          "name": {"type": "string"},
-          "description": {"type": "string"},
-          "input_schema_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "input_schema_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
         }
       }
     },
@@ -81,29 +118,53 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "snapshot", "live"],
+        "required": [
+          "name",
+          "snapshot",
+          "live"
+        ],
         "properties": {
-          "name": {"type": "string"},
+          "name": {
+            "type": "string"
+          },
           "snapshot": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["input_schema_hash"],
+            "required": [
+              "input_schema_hash"
+            ],
             "properties": {
-              "description": {"type": "string"},
-              "input_schema_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+              "description": {
+                "type": "string"
+              },
+              "input_schema_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
             }
           },
           "live": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["input_schema_hash"],
+            "required": [
+              "input_schema_hash"
+            ],
             "properties": {
-              "description": {"type": "string"},
-              "input_schema_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+              "description": {
+                "type": "string"
+              },
+              "input_schema_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
             }
           }
         }
       }
+    },
+    "server_id": {
+      "type": "string",
+      "description": "Registry id of the MCP server this report covers. Emitted by validate_mcp_surface.py when the gate runs parameterized over the server registry; absent for a single-server run."
     }
   }
 }
