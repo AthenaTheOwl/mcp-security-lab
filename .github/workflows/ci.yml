@@ -9,11 +9,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           path: mcp-security-lab
       - name: Check out athena-site (sibling repo for MCP surface gate)
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: AthenaTheOwl/athena-site
           path: athena-site
