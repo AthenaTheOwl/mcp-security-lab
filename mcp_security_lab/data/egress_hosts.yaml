@@ -1,0 +1,64 @@
+# Host lists for `mcp_security_lab egress`. Entries match the host itself and
+# any subdomain of it. Lists go stale; extend them as new services appear.
+shorteners:
+  - bit.ly
+  - tinyurl.com
+  - t.co
+  - goo.gl
+  - ow.ly
+  - is.gd
+  - buff.ly
+  - cutt.ly
+  - rb.gy
+  - tiny.cc
+  - shorturl.at
+  - rebrand.ly
+form_or_paste:
+  - forms.gle
+  - formspree.io
+  - formsubmit.co
+  - getform.io
+  - forms.office.com
+  - typeform.com
+  - jotform.com
+  - pastebin.com
+  - hastebin.com
+  - paste.ee
+  - dpaste.com
+  - rentry.co
+  - ghostbin.com
+  - webhook.site
+  - requestbin.com
+  - requestcatcher.com
+  - hookbin.com
+  - pipedream.net
+  - beeceptor.com
+  - ptsv2.com
+  - httpbin.org
+tunnels:
+  - ngrok.io
+  - ngrok.app
+  - ngrok.dev
+  - ngrok-free.app
+  - trycloudflare.com
+  - loca.lt
+  - localtunnel.me
+  - serveo.net
+  - localhost.run
+  - lhr.life
+  - pagekite.me
+  - tunnelmole.net
+  - portmap.io
+# Multi-label public suffixes: a wildcard directly above one of these covers
+# every registrant under it, like a wildcard over a TLD.
+public_suffixes:
+  - co.uk
+  - org.uk
+  - ac.uk
+  - com.au
+  - co.jp
+  - co.in
+  - com.br
+  - co.nz
+  - co.za
+  - com.cn

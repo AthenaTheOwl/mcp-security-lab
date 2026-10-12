@@ -41,6 +41,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Markdown report path; defaults to the JSON path with .md suffix",
     )
 
+    egress = subcommands.add_parser(
+        "egress",
+        help="lint an agent sandbox's network allowlist for exfiltration-friendly entries",
+    )
+    egress.add_argument(
+        "policy", type=Path, help="JSON or YAML policy with allowed_hosts, or a settings file"
+    )
+    egress.add_argument("--json", action="store_true", help="print findings as JSON")
+
     show = subcommands.add_parser(
         "show",
         help="print a ranked, human-readable summary of a committed report",
@@ -102,6 +111,11 @@ def _run(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
             print("Policy denied at least one server or tool.")
             return 1
         return 0
+
+    if args.command == "egress":
+        from .egress import run_egress
+
+        return run_egress(args.policy, as_json=args.json)
 
     if args.command == "show":
         import json
