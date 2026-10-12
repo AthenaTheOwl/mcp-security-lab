@@ -97,6 +97,19 @@ package, whether the auth is valid, hidden text returned after connection, and
 network-destination safety past the static URL are all outside what a config can
 tell you, and the tool says so rather than pretending otherwise.
 
+## Egress allowlist lint
+
+`egress` reads an agent sandbox's network allowlist and names the entries that would let an allowed request carry data out: wildcards, URL shorteners, form and paste hosts, reverse tunnels and raw IP addresses.
+
+```powershell
+python -m mcp_security_lab egress examples/egress/leaky-policy.json
+python -m mcp_security_lab egress examples/egress/tight-policy.json --json
+```
+
+The policy is JSON or YAML with an `allowed_hosts` list, or a settings file whose `permissions.allow` holds `WebFetch(domain:...)` entries. Any other shape exits 2. Findings exit 1. The host lists live in `mcp_security_lab/data/egress_hosts.yaml`.
+
+A clean result means none of the listed patterns matched, nothing more. A static read cannot see DNS exfiltration, redirects that happen at runtime, or hosts the lists do not know.
+
 ## Measured against real configs
 
 The scanner is graded against 25 publicly documented MCP configurations from `modelcontextprotocol/servers`, `modelcontextprotocol/servers-archived`, `geelen/mcp-remote`, and `github/github-mcp-server`. The corpus keeps its provenance in `eval/manifest.json`; hand-labeled ground truth lives in `eval/labels.json`.

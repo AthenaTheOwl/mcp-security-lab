@@ -1,0 +1,13 @@
+{
+  "allowed_hosts": [
+    "api.github.com",
+    "pypi.org",
+    "files.pythonhosted.org",
+    "*.python.org"
+  ],
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.python.org)"
+    ]
+  }
+}

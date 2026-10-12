@@ -24,3 +24,6 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["mcp_security_lab*"]
+
+[tool.setuptools.package-data]
+mcp_security_lab = ["data/*.yaml"]
