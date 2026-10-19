@@ -27,11 +27,6 @@ It does not watch the server after it starts, vet the package behind the command
 or judge whether the auth it found is real. It catches the things that are
 visible at review time, which is the moment you still have the choice.
 
-The [read-only scout boundary](docs-read-only-scout.md) applies the scanner to a
-research agent that reads sources but does not publish. It covers separate
-publishing authority, credential audiences, egress checks, and the runtime
-evidence an offline allow verdict leaves unresolved.
-
 ## Try it
 
 One command, no arguments, no network. It reads the committed example report and
