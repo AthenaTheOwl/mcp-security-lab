@@ -21,10 +21,16 @@ date, SHA, title, scope, and proof refs.
   surface-diff fixture to the existing report producer. Validate the synthetic
   example and any generated runtime reports; keep the live registry drift gate.
 - proof:
-  - pytest — full fresh-default suite, including the producer and schema fixture
-  - validate_data_conformance — one committed fixture checked on a clean checkout
-  - native governance gates — all pass for the scoped source commit above
-  - live surface drift — separate CI registry gate; fixture makes no live claim
+  - pytest — `.github/workflows/ci.yml` (Tests step); fixture test in
+    `tests/test_surface_report_fixture.py`
+  - validate_data_conformance — `.github/workflows/ci.yml`
+    (validate_data_conformance step); one committed fixture on a clean checkout
+  - native governance gates — `.github/workflows/ci.yml` (Voice lint through
+    Schema cache freshness steps)
+  - live surface drift — `.github/workflows/ci.yml` (Validate registered MCP
+    server tool surfaces step); fixture makes no live claim
+  - CI run on PR #17 head e1da635 (this source plus this entry) —
+    https://github.com/AthenaTheOwl/mcp-security-lab/actions/runs/39195073361
 
 ## 2026-05-25 — pre-CDCP init MCP Security Lab MVP
 
