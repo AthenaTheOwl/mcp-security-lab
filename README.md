@@ -193,11 +193,12 @@ python scripts/validate_data_conformance.py
 ```
 
 `python scripts/validate_data_conformance.py` validates the committed synthetic
-surface-diff fixture on a clean checkout, plus any report the surface drift gate
-has written to `reports/mcp-surface-diff*.json`. The fixture exercises added,
-removed, changed, and unchanged tools; its producer test pins the report shape.
-It provides schema evidence. The separate CI registry gate still regenerates real
-tool surfaces to check runtime drift.
+surface-diff fixture on a clean checkout, plus any report
+`scripts/validate_mcp_surface.py` has written to `reports/mcp-surface-diff*.json`.
+The fixture exercises added, removed, changed, and unchanged tools; its producer
+test pins the report shape. It provides schema evidence. CI runs
+`scripts/validate_mcp_surface.py --all` against the registry to regenerate real
+tool surfaces and check them for runtime drift.
 
 ## License
 
