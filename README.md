@@ -8,6 +8,17 @@ learn this before any of the three connect.
 
 ## What it does
 
+The [read-only scout boundary](docs-read-only-scout.md) applies the scanner to a
+public research-agent pilot, including separate publishing authority, credential
+audiences, egress checks, and the runtime evidence an offline allow verdict leaves
+unresolved.
+
+`python scripts/validate_data_conformance.py` validates the committed synthetic
+surface-diff fixture on a clean checkout and any generated runtime reports. The
+fixture exercises added, removed, changed, and unchanged tools; its producer test
+pins the report shape. It provides schema evidence. The separate CI registry gate
+still regenerates real tool surfaces to check runtime drift.
+
 An MCP server is a process your agent trusts. Before it joins the allowlist,
 someone has to read the config and decide whether trusting it is a mistake. That
 read is the kind of work that gets skipped when there are three servers and a
