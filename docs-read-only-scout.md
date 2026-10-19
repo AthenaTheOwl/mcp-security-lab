@@ -1,7 +1,7 @@
 # A read-only scout still crosses a trust boundary
 
-A portfolio research agent may read public agent-network discussions, retrieve
-primary sources, and prepare a local draft. A different step publishes that draft.
+A portfolio research agent may read public discussions, retrieve primary
+sources, and prepare a local draft. A different step publishes that draft.
 Keeping those operations separate gives this scanner a concrete review question:
 which configured capabilities exceed the scout's assigned work?
 
@@ -23,10 +23,10 @@ explains token audience and passthrough risks. This scanner cannot verify the
 claims inside a token or a server's honest implementation of a read-only label.
 Its allow verdict is a static policy result over supplied declarations.
 
-A review of the report grants no permission to post or to bypass an access
-denial. Keep the scout's assignment to finding and reading sources and writing a
-local evidence memo. Give a later publishing step only the approved content and
-the minimum required authority.
+A review of the report grants no permission to post, to bypass an access
+denial, or to share private material. Keep the scout's assignment to finding and
+reading sources and writing a local evidence memo. Give a later publishing step
+only the approved content and the minimum required authority.
 
 Acceptance should include one clean read-only declaration and one changed
 declaration with a write tool, plus a runtime attempt that proves the write is

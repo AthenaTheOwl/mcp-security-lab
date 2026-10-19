@@ -9,9 +9,9 @@ learn this before any of the three connect.
 ## What it does
 
 The [read-only scout boundary](docs-read-only-scout.md) applies the scanner to a
-public research-agent pilot, including separate publishing authority, credential
-audiences, egress checks, and the runtime evidence an offline allow verdict leaves
-unresolved.
+research agent that reads sources but does not publish. It covers separate
+publishing authority, credential audiences, egress checks, and the runtime
+evidence an offline allow verdict leaves unresolved.
 
 `python scripts/validate_data_conformance.py` validates the committed synthetic
 surface-diff fixture on a clean checkout and any generated runtime reports. The
