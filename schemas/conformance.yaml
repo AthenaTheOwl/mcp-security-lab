@@ -6,6 +6,8 @@ version: 1
 mappings:
   - schema: mcp-surface-diff.schema.json
     # The synthetic producer fixture keeps this mapping exercised offline.
-    # Runtime reports are also validated whenever the live drift gate emits them.
-    files: ["examples/mcp-surface-diff.*.json", "reports/mcp-surface-diff.*.json"]
+    # Runtime reports are also validated whenever the live drift gate emits them:
+    # per-server reports/mcp-surface-diff.<server-id>.json from --all, and
+    # reports/mcp-surface-diff.json from ad-hoc --snapshot/--live runs.
+    files: ["examples/mcp-surface-diff.*.json", "reports/mcp-surface-diff*.json"]
     records: self
