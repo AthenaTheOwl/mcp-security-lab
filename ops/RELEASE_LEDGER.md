@@ -17,14 +17,17 @@ date, SHA, title, scope, and proof refs.
 
 ## 2026-10-19 — 26363279694041f87550587aa8d032a9536e7c9d correction: scout boundary doc withdrawn
 
-- scope: Corrects the 2026-10-18 entry for 0261caa. The read-only scout doc
-  and its README pointer are withdrawn, so that entry's scouting-limits scope
-  no longer ships. The offline surface-diff fixture, its conformance mapping,
-  and its producer test stay. The conformance gate reads generated reports
-  only at `reports/mcp-surface-diff*.json`, not every generated runtime report.
+- scope: Withdraws the read-only scout doc and its README pointer from the
+  2026-10-18 entry for 0261caa; the offline surface-diff fixture, its
+  conformance mapping, and its producer test stay. Conformance reads generated
+  reports only at `reports/mcp-surface-diff*.json`, a glob widened from
+  `mcp-surface-diff.*.json` so ad-hoc `reports/mcp-surface-diff.json` runs are
+  validated too.
 - proof:
   - withdrawal — commit 2636327 deletes `docs-read-only-scout.md` and the
     README paragraph that pointed to it
+  - glob widening — commit c992fe0 changes the surface-diff mapping in
+    `schemas/conformance.yaml`
   - pytest — `.github/workflows/ci.yml` (Tests step); fixture and glob
     coverage tests in `tests/test_surface_report_fixture.py`
   - validate_data_conformance — `.github/workflows/ci.yml`
